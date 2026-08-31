@@ -246,16 +246,16 @@ export function CameraMenu({ isOpen, onClose, onNavigate }: CameraMenuProps) {
 
     if (target.targetId === 'themes') {
       if (!iframe.src.endsWith('/themes.html')) {
-        iframe.src = '/themes.html';
+        iframe.src = `${import.meta.env.BASE_URL}themes.html`;
       }
     } else if (target.targetId === 'submissions') {
       if (!iframe.src.endsWith('/Submissions.html')) {
-        iframe.src = '/Submissions.html';
+        iframe.src = `${import.meta.env.BASE_URL}Submissions.html`;
       }
     } else {
       const isMain = iframe.src.includes('/main.html');
       if (!isMain) {
-        iframe.src = `/main.html#${target.targetId}`;
+        iframe.src = `${import.meta.env.BASE_URL}main.html#${target.targetId}`;
       } else {
         try {
           const doc = iframe.contentDocument;
@@ -503,7 +503,7 @@ export function CameraMenu({ isOpen, onClose, onNavigate }: CameraMenuProps) {
                   <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#020508]">
                     <iframe
                       ref={previewIframeRef}
-                      src="/main.html"
+                      src={`${import.meta.env.BASE_URL}main.html`}
                       title="CameraOS Section Preview"
                       className="absolute left-0 top-0 w-[1280px] h-[800px] border-0 pointer-events-none origin-top-left"
                       style={{

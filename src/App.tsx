@@ -239,7 +239,7 @@ function SpeculoAppInner() {
       >
         <iframe
           ref={mainIframeRef}
-          src="/main.html"
+          src={`${import.meta.env.BASE_URL}main.html`}
           title="Speculo Main Exhibition"
           onLoad={handleIframeLoad}
           className="w-full h-full border-0 bg-[#020508]"
