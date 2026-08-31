@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speculo '26 - Photographic Society of Dharmaraja College</title>
+    <meta name="description" content="Speculo '26 - Photographic Society of Dharmaraja College interactive experience featuring video scrubbing, CameraOS viewfinder, and all-island photography exhibition." />
+    <meta property="og:title" content="Speculo '26 - Photographic Society of Dharmaraja College" />
+    <meta property="og:description" content="Speculo '26 - Photographic Society of Dharmaraja College interactive experience featuring video scrubbing, CameraOS viewfinder, and all-island photography exhibition." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Google Fonts: Orbitron + Share Tech Mono (moved from inline @import) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        document.body.innerHTML += '<div style="position:fixed;top:50px;left:50px;background:red;color:white;padding:20px;z-index:999999;font-family:monospace;white-space:pre-wrap;">ERROR: ' + msg + '<br/>' + (error && error.stack ? error.stack : '') + '</div>';
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        document.body.innerHTML += '<div style="position:fixed;top:50px;left:50px;background:red;color:white;padding:20px;z-index:999999;font-family:monospace;white-space:pre-wrap;">PROMISE REJECTION: ' + (event.reason && event.reason.stack ? event.reason.stack : event.reason) + '</div>';
+      });
+    </script>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99999] focus:bg-cyan-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to content</a>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

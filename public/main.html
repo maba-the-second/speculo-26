@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Speculo '26 - Photographic Society of Dharmaraja College</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Montserrat', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                dark: '#03080d',
+                card: '#071018',
+                teal: '#64dfdf',
+                tealGlow: '#48bfe3',
+                gold: '#f0e6d2'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Performance & Preconnect CDN Hints -->
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            background-color: #020508 !important;
+            background: #020508 !important;
+            width: 100%;
+            min-height: 100vh;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Moving Gradient Background */
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .poster-bg {
+            background: linear-gradient(135deg, #020508, #07131d, #03080d, #0a1926);
+            background-size: 300% 300%;
+            animation: moveGradient 18s ease infinite;
+        }
+
+        /* Film Grain Overlay */
+        .film-grain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Vignette and Side Feathers for Hero Portrait */
+        .side-feather-mask {
+            mask-image: linear-gradient(
+                to right,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,1) 15%,
+                rgba(0,0,0,1) 85%,
+                rgba(0,0,0,0) 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                to right,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,1) 15%,
+                rgba(0,0,0,1) 85%,
+                rgba(0,0,0,0) 100%
+            );
+        }
+
+        /* Glow Effects */
+        .glow-cyan {
+            text-shadow: 0 0 20px rgba(100, 223, 223, 0.45);
+        }
+
+        .glow-gold {
+            text-shadow: 0 0 20px rgba(240, 230, 210, 0.5);
+        }
+
+        .exec-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 15%;
+            height: 70%;
+            width: 1px;
+            background: rgba(100, 223, 223, 0.2);
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        /* Complete suppression of cursor follower and oversized mouse circles */
+        .cursor-light,
+        .cursor-follower,
+        .mouse-circle,
+        .cursor-circle {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        /* ============================================================
+   FIXED WEBGL LAYERS
+   Background and logo use separate stacking contexts.
+   The logo is intentionally above the scroll content but below
+   the gallery, HUD and committee layers.
+============================================================ */
+.fixed-canvas-container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-width: 1px;
+    min-height: 1px;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+    isolation: isolate;
+    contain: layout paint size;
+}
+
+#bgScannerCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 1px;
+    min-height: 1px;
+    display: block;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#logoWarpCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-width: 1px;
+    min-height: 1px;
+    display: block;
+    pointer-events: none;
+    z-index: 20;
+    mix-blend-mode: screen;
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform, opacity;
+    contain: strict;
+}
+
+/* Dedicated GPU-accelerated backdrop veil for cinematic gallery transition */
+        #galleryBackdropVeil {
+            position: fixed;
+            inset: 0;
+            z-index: 12;
+            pointer-events: none;
+            background: transparent;
+            opacity: 0;
+            will-change: opacity;
+        }
+
+        /* Fixed Action Buttons - Stays pinned above background, passes under Executive Committee */
+        .speculo-fixed-actions {
+            position: fixed;
+            left: 50%;
+            bottom: 32px;
+            transform: translateX(-50%);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            pointer-events: auto;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        @media (max-width: 640px) {
+            .speculo-fixed-actions {
+                bottom: 20px;
+                width: calc(100% - 24px);
+                gap: 8px;
+            }
+        }
+
+        /* Force the About / Sri Lanka cards to sit dead-center on phones,
+           center the titles, and center-justify paragraphs on mobile. */
+        @media (max-width: 767px) {
+            #textSection1, #textSection2 {
+                justify-content: center !important;
+            }
+            #card1, #card2 {
+                margin-left: auto !important;
+                margin-right: auto !important;
+                text-align: center !important;
+            }
+            #card1 h2, #card2 h2 {
+                text-align: center !important;
+            }
+            #animatedText1, #animatedText2 {
+                text-align: justify !important;
+                text-justify: inter-word !important;
+                text-align-last: center !important;
+            }
+            #galleryDotsContainer, nav[aria-label="Gallery Pagination"] {
+                display: none !important;
+            }
+        }
+
+        /* Solid Cinematic Executive Committee & Footer Flow */
+        .committee-locked {
+            display: none !important;
+        }
+
+        #committeeSection {
+            position: relative;
+            z-index: 100;
+            background: #020508;
+            isolation: isolate;
+            width: 100%;
+        }
+
+        #committeeSection .film-grain {
+            z-index: 1;
+        }
+
+        #committeeSection #committeeRoot {
+            position: relative;
+            z-index: 10;
+        }
+
+        #mainFooter {
+            position: relative;
+            z-index: 100;
+            background: #020508;
+            isolation: isolate;
+            width: 100%;
+        }
+
+        /* Animated Logo on Hover */
+        .logo-hover-animate {
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+            cursor: pointer;
+            will-change: transform, filter;
+        }
+
+        .logo-hover-animate:hover {
+            transform: scale(1.12) translateY(-3px) rotate(-2deg);
+            filter: drop-shadow(0 0 20px rgba(100, 223, 223, 0.95)) drop-shadow(0 0 35px rgba(100, 223, 223, 0.5)) brightness(1.25);
+            animation: logoGlowPulse 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlowPulse {
+            0% {
+                filter: drop-shadow(0 0 16px rgba(100, 223, 223, 0.8)) brightness(1.2);
+                transform: scale(1.1) translateY(-2px) rotate(-1.5deg);
+            }
+            100% {
+                filter: drop-shadow(0 0 30px rgba(100, 223, 223, 1)) drop-shadow(0 0 45px rgba(100, 223, 223, 0.6)) brightness(1.4);
+                transform: scale(1.15) translateY(-5px) rotate(2deg);
+            }
+        }
+
+        /* Social Icons */
+        .social-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 6px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            background: #071018;
+            border: 1px solid rgba(100, 223, 223, 0.25);
+            color: #cbd5e1;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .social-icon:hover {
+            color: #020508;
+            background: #64dfdf;
+            border-color: #64dfdf;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 0 25px rgba(100, 223, 223, 0.7);
+        }
+
+        .social-icon:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* Scroll Content Structure */
+        .scroll-container {
+            position: relative;
+            z-index: 30;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .scroll-section {
+            position: relative;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 1.5rem;
+            pointer-events: auto;
+        }
+
+        /* Gallery Trigger Scroll Section */
+        #galleryTriggerSection {
+            height: 850vh;
+            width: 100%;
+            position: relative;
+            pointer-events: none;
+            visibility: visible;
+        }
+
+        /* Text Cinematic Cards */
+        .cinematic-glass-card {
+            background: rgba(7, 18, 30, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(100, 223, 223, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(100, 223, 223, 0.2);
+            border-radius: 24px;
+            position: relative;
+            z-index: 35;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+        }
+
+        .cinematic-glass-card:hover {
+            border-color: rgba(100, 223, 223, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .word-span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(16px) scale(0.96);
+            filter: blur(8px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+            will-change: transform, opacity, filter;
+        }
+
+        .word-span.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+        }
+
+        .text-justify {
+            text-align: justify;
+            text-justify: inter-word;
+        }
+
+        /* Liquid Glass Controls & Indicators */
+        .liquid-glass {
+            background: rgba(4, 14, 24, 0.60);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid rgba(100, 223, 223, 0.28);
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gallery-dot-btn {
+            min-width: 28px;
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 4px;
+            outline: none;
+            border-radius: 9999px;
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-dot-btn:active {
+            transform: scale(0.92);
+        }
+
+        .gallery-dot-pill {
+            height: 6px;
+            border-radius: 9999px;
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: width, background, box-shadow, transform;
+            display: block;
+        }
+
+        .gallery-dot-pill.active {
+            width: 26px;
+            background: linear-gradient(90deg, #64DFDF 0%, #00b4d8 100%);
+            box-shadow: 0 0 14px rgba(100, 223, 223, 0.9), inset 0 1px 1.5px rgba(255, 255, 255, 0.7);
+        }
+
+        .gallery-dot-pill.inactive {
+            width: 6px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .gallery-dot-btn:hover .gallery-dot-pill.inactive {
+            background: rgba(255, 255, 255, 0.75);
+            transform: scale(1.2);
+        }
+
+        /* Skeleton Shimmer Loader */
+        @keyframes pulse-bg {
+            0%, 100% { background-color: rgba(10, 20, 30, 0.9); }
+            50% { background-color: rgba(25, 45, 65, 0.8); }
+        }
+        .skeleton-loader {
+            animation: pulse-bg 1.8s ease-in-out infinite;
+        }
+
+        /* Animated Gesture Hint */
+        @keyframes hint-swipe {
+            0% { transform: translateX(-8px); opacity: 0.4; }
+            50% { transform: translateX(8px); opacity: 1; }
+            100% { transform: translateX(-8px); opacity: 0.4; }
+        }
+        .animate-hint-swipe {
+            animation: hint-swipe 2s ease-in-out infinite;
+        }
+
+        /* Fixed Fullscreen Cinematic Gallery Overlay */
+        #galleryOverlay {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 16;
+            pointer-events: none;
+            opacity: 0;
+            overflow: hidden;
+            will-change: opacity;
+            background: transparent;
+        }
+
+        #galleryTrack {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            will-change: transform;
+            image-rendering: -webkit-optimize-contrast;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020508; }
+        ::-webkit-scrollbar-thumb { background: rgba(32, 82, 107, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3AAFA9; }
+
+        /* Locked Cinematic Navigation HUD */
+        .speculo-fixed-actions {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            max-width: 92vw;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 640px) {
+            .speculo-fixed-actions {
+                bottom: 22px;
+                width: 100%;
+                padding: 0 12px;
+            }
+        }
+
+        /* Committee & Footer Boundary */
+        #committeeSection {
+            background-color: #020508;
+            position: relative;
+            z-index: 100;
+            isolation: isolate;
+        }
+
+        footer {
+            background-color: #020508;
+            position: relative;
+            z-index: 100;
+            isolation: isolate;
+        }
+    </style>
+</head>
+<body class="bg-[#020508] text-white w-full min-h-screen m-0 p-0 select-none overflow-x-hidden">
+
+    <!-- Dedicated GPU-accelerated backdrop veil for cinematic gallery transition -->
+    <div id="galleryBackdropVeil"></div>
+
+    <!-- Fixed WebGL Background -->
+    <div class="fixed-canvas-container" id="appContainer">
+        <canvas id="bgScannerCanvas"></canvas>
+    </div>
+
+    <!-- Logo is deliberately outside the background stacking context.
+         This fixes the original z-index bug where the logo was trapped
+         behind the scroll content. -->
+    <canvas id="logoWarpCanvas" aria-hidden="true"></canvas>
+
+    <!-- Pinned Returning User Upload Shortcut Root -->
+    <div id="logoUploadShortcutRoot"></div>
+
+    <!-- Fixed Cinematic HUD Navigation Area (Explore Themes & Submit Entry) -->
+    <div id="finalActionButtonsRoot" class="speculo-fixed-actions"></div>
+
+    <!-- Fixed Bottom-Left Down Arrow Navigation Root -->
+    <div id="committeeUnlockButtonRoot"></div>
+
+    <!-- Main Vertical Scrollable Content Hierarchy -->
+    <div class="scroll-container" id="speculoScrollContainer">
+        
+        <!-- Hero Section -->
+        <section class="scroll-section flex-col justify-end pb-16 text-center" id="heroSection">
+            <div class="flex flex-col items-center mt-auto pt-12">
+                <div class="text-[#3AAFA9] text-xs tracking-[0.35em] uppercase font-semibold mb-3 animate-pulse">
+                    Scroll to Explore
+                </div>
+                <div class="w-6 h-10 border-2 border-[#20526B]/80 rounded-full flex justify-center p-1 backdrop-blur-sm bg-gray-950/40">
+                    <div class="w-1.5 h-3 bg-[#3AAFA9] rounded-full animate-bounce"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legacy of Visual Storytelling Section -->
+        <section class="scroll-section justify-center lg:justify-end px-4 sm:px-8 md:px-16 lg:px-24" id="textSection1">
+            <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-white text-center lg:text-left">Legacy of Visual Storytelling</h2>
+                <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText1">Founded in 2003, the Photographic Society of Dharmaraja College has been dedicated to promoting photography among young enthusiasts through national events, competitions, livestreams, workshops, and educational activities, helping students develop their creative vision and technical mastery.</p>
+            </div>
+        </section>
+
+        <!-- Dedicated Gallery Trigger Scroll Space -->
+        <section id="galleryTriggerSection" aria-label="Cinematic Gallery Scroll Distance"></section>
+
+        <!-- Sri Lanka’s Premier All-Island Photography Competition Section -->
+        <section class="scroll-section justify-center lg:justify-start px-4 sm:px-8 md:px-16 lg:px-24" id="textSection2">
+            <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:mr-auto lg:ml-0" id="card2">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-white text-center lg:text-left">Sri Lanka’s Premier All-Island Photography Competition</h2>
+                <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText2">Speculo is the society’s signature all-island photography competition and exhibition, providing Sri Lankan photographers with a powerful platform. The event features hands-on masterclasses by renowned photographers and a live photography photowalk capturing the historic beauty of Sri Lanka.</p>
+            </div>
+        </section>
+
+        <!-- Final Centered Logo Section -->
+        <section class="scroll-section flex-col justify-center items-center text-center px-6 md:px-16 relative min-h-[90vh] pb-32" id="finalSection">
+        </section>
+
+        <!-- Executive Committee Section -->
+        <section class="w-full relative overflow-x-hidden poster-bg flex flex-col items-center justify-center pt-8 pb-6 sm:pt-12 sm:pb-8 z-[100] pointer-events-auto border-t border-brand-teal/20 committee-locked" id="committeeSection">
+            <div class="film-grain"></div>
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-teal/5 rounded-full blur-[140px] pointer-events-none"></div>
+            <div id="committeeRoot" class="w-full max-w-7xl flex flex-col items-center relative z-20"></div>
+        </section>
+
+        <!-- Advanced Cinematic Footer -->
+        <footer id="mainFooter" class="w-full py-12 sm:py-14 px-6 sm:px-10 lg:px-16 border-t border-brand-teal/20 pointer-events-auto bg-[#020508] relative z-[100] overflow-hidden text-slate-300 committee-locked">
+            <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-brand-teal/10 rounded-full blur-[140px] pointer-events-none"></div>
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pb-8 border-b border-white/10 relative z-10">
+                <div class="flex flex-col items-start space-y-3 text-left max-w-xl">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/Logo%20White.png" alt="Rajans Photography Logo" class="h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(100,223,223,0.6)] logo-hover-animate">
+                        <div>
+                            <span class="block font-bold tracking-[0.18em] text-white text-base">RAJANS <B>PHOTOGRAPHY</B></span>
+                            <span class="block text-[11px] tracking-[0.15em] text-brand-teal font-medium uppercase">Photographic Society of Dharmaraja College</span>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-400 font-normal leading-relaxed pt-1">
+                        Established in 2003, Dharmaraja College Photographic Society empowers Sri Lankan student photographers to master visual narrative, composition, and digital craft through premier national exhibitions and masterclasses.
+                    </p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/share/1QfghGFeBN/?mibextid=wwXIfr" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://www.instagram.com/rajans.photography/?utm_source=ig_web_button_share_sheet" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://m.youtube.com/@RAJANSPHOTOGRAPHY" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-start md:items-end text-left md:text-right space-y-2">
+                    <h4 class="text-xs font-bold tracking-[0.2em] text-brand-teal uppercase">CONTACT</h4>
+                    <div class="text-xs text-slate-400 space-y-1.5 pt-1">
+                        <p class="text-slate-200 font-medium text-sm">Dharmaraja College</p>
+                        <p>Kandy 20000, Central Province, Sri Lanka</p>
+                        <p class="text-brand-teal pt-1 font-mono text-[11px] font-semibold tracking-wider">CONTACT | +94 70 669 0075</p>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center text-[11px] text-slate-500 font-mono">
+                <div>© 2026 DHARMARAJA COLLEGE PHOTOGRAPHIC SOCIETY. ALL RIGHTS RESERVED.</div>
+                <div class="text-brand-teal/80 mt-2 sm:mt-0">SPECULO '26 EXHIBITION</div>
+            </div>
+        </footer>
+ 
+
+    <!-- Fixed Fullscreen Gallery Overlay -->
+    <div id="galleryOverlay" aria-hidden="true">
+        <div id="galleryDragHint" class="pointer-events-none fixed inset-x-0 bottom-20 z-30 flex flex-col items-center justify-center transition-opacity duration-700 opacity-0" style="display: none;">
+            <div class="liquid-glass px-5 py-2.5 rounded-full flex items-center space-x-3 text-white/80 text-xs tracking-wider uppercase shadow-xl">
+                <span>Scroll to Traverse Gallery • Click to View</span>
+            </div>
+        </div>
+        <nav class="fixed bottom-6 inset-x-0 z-30 flex justify-center pointer-events-none" aria-label="Gallery Pagination">
+            <div id="galleryDotsContainer" class="liquid-glass px-3.5 py-1.5 rounded-full flex items-center space-x-2 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity duration-500"></div>
+        </nav>
+        <main id="galleryTrack"></main>
+    </div>
+
+    <!-- High Detail Fullscreen Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4 md:p-12">
+        <button id="closeLightbox" aria-label="Close Lightbox" class="absolute top-6 right-6 z-50 liquid-glass w-12 h-12 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:border-[#64DFDF] focus:outline-none transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="relative w-full h-full flex items-center justify-center overflow-hidden" id="lightboxContainer">
+            <img id="lightboxImg" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-transform duration-300" src="" alt="Fullscreen Photography">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const appContainer = document.getElementById('appContainer');
+            const speculoScrollContainer = document.getElementById('speculoScrollContainer');
+            const galleryBackdropVeil = document.getElementById('galleryBackdropVeil');
+            const bgCanvas = document.getElementById('bgScannerCanvas');
+            const logoWarpCanvas = document.getElementById('logoWarpCanvas');
+
+            const galleryOverlay = document.getElementById('galleryOverlay');
+            const galleryTrack = document.getElementById('galleryTrack');
+            const galleryDotsContainer = document.getElementById('galleryDotsContainer');
+            const galleryDragHint = document.getElementById('galleryDragHint');
+            const galleryTriggerSection = document.getElementById('galleryTriggerSection');
+
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            const closeLightbox = document.getElementById('closeLightbox');
+            const lightboxContainer = document.getElementById('lightboxContainer');
+
+            const rawImages = [
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(1).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(2).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(3).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(4).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(5).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(6).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(7).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(8).jpg`,
+                `https://raw.githubusercontent.com/rajansphotography/spec/main/1%20(9).jpg`
+            ];
+
+            const totalSlides = rawImages.length;
+            let slideWidth = window.innerWidth;
+            let currentTrackX = 0;
+            let targetTrackX = 0;
+            let activeSlideIndex = 0;
+
+            rawImages.forEach((_, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'gallery-dot-btn';
+                btn.setAttribute('aria-label', `Go to photograph ${idx + 1}`);
+                
+                const pill = document.createElement('span');
+                pill.className = `gallery-dot-pill ${idx === 0 ? 'active' : 'inactive'}`;
+                btn.appendChild(pill);
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    jumpToGallerySlide(idx);
+                });
+                galleryDotsContainer.appendChild(btn);
+            });
+
+            rawImages.forEach((src, idx) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide-container';
+                slide.setAttribute('data-index', idx);
+
+                const skeleton = document.createElement('div');
+                skeleton.className = 'absolute inset-0 skeleton-loader';
+                slide.appendChild(skeleton);
+
+                const img = document.createElement('img');
+                img.alt = `Speculo Photography Exhibit ${idx + 1}`;
+                img.loading = idx < 3 ? 'eager' : 'lazy';
+                img.className = 'slide-img opacity-0';
+
+                const handleImageReveal = () => {
+                    img.classList.remove('opacity-0');
+                    img.classList.add('opacity-100');
+                    skeleton.classList.add('hidden');
+                };
+
+                img.onload = handleImageReveal;
+                img.onerror = () => {
+                    img.src = `https://placehold.co/1920x1080/06141F/64DFDF?text=Speculo+Photograph+${idx + 1}`;
+                    handleImageReveal();
+                };
+                img.src = src;
+                slide.appendChild(img);
+
+                slide.addEventListener('click', () => {
+                    openLightbox(img.src, `Speculo Photography Exhibit ${idx + 1}`);
+                });
+
+                galleryTrack.appendChild(slide);
+            });
+
+            function jumpToGallerySlide(index) {
+                if (!galleryTriggerSection) return;
+                const scrollPos = window.scrollY || window.pageYOffset;
+                const galleryTop = galleryTriggerSection.getBoundingClientRect().top + scrollPos;
+                const galleryHeight = galleryTriggerSection.offsetHeight;
+                const vh = window.innerHeight;
+                const totalDist = Math.max(1, galleryHeight - vh);
+                const targetProgress = 0.06 + (index / (totalSlides - 1)) * (0.94 - 0.06);
+                const targetScroll = galleryTop + (targetProgress * totalDist);
+                window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            }
+
+            function openLightbox(src, alt) {
+                lightboxImg.src = src;
+                lightboxImg.alt = alt;
+                lightbox.classList.remove('pointer-events-none', 'opacity-0');
+                lightbox.classList.add('opacity-100');
+            }
+
+            function closeLightboxModal() {
+                lightbox.classList.remove('opacity-100');
+                lightbox.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            closeLightbox.addEventListener('click', closeLightboxModal);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox || e.target === lightboxContainer) closeLightboxModal();
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeLightboxModal();
+            });
+
+            const offscreenLogoCanvas = document.createElement('canvas');
+            const logoCtx = offscreenLogoCanvas.getContext('2d');
+            const shineCanvas = document.createElement('canvas');
+            const shineCtx = shineCanvas.getContext('2d');
+
+            const logoBase = new Image();
+            const logoLens = new Image();
+            logoBase.crossOrigin = "anonymous";
+            logoLens.crossOrigin = "anonymous";
+
+            let hasBaseImage = false;
+            let hasLensImage = false;
+            let currentAngle = 0;
+            const rotationSpeed = 0.0035;
+            let lensCenter = { x: 0, y: 0 };
+
+            let isHovered = false;
+            let shineProgress = -0.5;
+            let shineSpeed = 0.018;
+            let shineAlpha = 0;
+
+            function calculateLensCenter(img) {
+                try {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = img.naturalWidth;
+                    tempCanvas.height = img.naturalHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    if (!tempCtx) return { x: img.naturalWidth / 2, y: img.naturalHeight / 2 };
+                    
+                    tempCtx.drawImage(img, 0, 0);
+                    const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                    const data = imgData.data;
+
+                    let minX = tempCanvas.width, maxX = 0, minY = tempCanvas.height, maxY = 0;
+                    let foundPixels = false;
+
+                    for (let y = 0; y < tempCanvas.height; y += 2) {
+                        for (let x = 0; x < tempCanvas.width; x += 2) {
+                            const alpha = data[(y * tempCanvas.width + x) * 4 + 3];
+                            if (alpha > 30) {
+                                foundPixels = true;
+                                if (x < minX) minX = x;
+                                if (x > maxX) maxX = x;
+                                if (y < minY) minY = y;
+                                if (y > maxY) maxY = y;
+                            }
+                        }
+                    }
+                    if (foundPixels) {
+                        return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
+                    }
+                } catch (e) {}
+                return { x: img.naturalWidth / 2, y: img.naturalHeight / 2 };
+            }
+
+            let logoPositionState = {
+                targetX: 0.5, targetY: 0.5, targetScale: 0.7,
+                currentX: 0.5, currentY: 0.5, currentScale: 0.7
+            };
+
+            const pointer = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, active: 0, activeTarget: 0 };
+            let mouseClientX = window.innerWidth / 2;
+            let mouseClientY = window.innerHeight / 2;
+            let currentSpotX = mouseClientX;
+            let currentSpotY = mouseClientY;
+            let mouseMoveTimeout;
+
+            let baseLoadAttempts = 0;
+
+            logoBase.onload = () => {
+                hasBaseImage = true;
+            };
+
+            logoBase.onerror = () => {
+                /* Never leave the WebGL logo empty because of a remote
+                   image/CORS failure. Try the bundled asset first. */
+                if (baseLoadAttempts === 0) {
+                    baseLoadAttempts++;
+                    logoBase.src = "logo-white.png";
+                } else if (baseLoadAttempts === 1) {
+                    baseLoadAttempts++;
+                    logoBase.src = "https://raw.githubusercontent.com/dulajbandara28-sketch/Rajans-Media-unit/main/Logo%20White.png";
+                }
+            };
+
+            logoLens.onload = () => {
+                hasLensImage = true;
+                lensCenter = calculateLensCenter(logoLens);
+            };
+
+            logoLens.onerror = () => {
+                /* The lens is decorative. The main Speculo logo must
+                   render even if the lens asset is unavailable. */
+                hasLensImage = false;
+                lensCenter = {
+                    x: logoBase.naturalWidth / 2 || 100,
+                    y: logoBase.naturalHeight / 2 || 100
+                };
+            };
+
+            logoBase.src = "https://raw.githubusercontent.com/rajansphotography/spec/main/Speculo%20_26%20white.png";
+            logoLens.src = "https://raw.githubusercontent.com/rajansphotography/spec/main/Speculo%20_26%20lens.png";
+
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                return shader;
+            }
+
+            function createProgram(gl, vsSource, fsSource) {
+                const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+                const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+                if (!vs || !fs) return null;
+                const program = gl.createProgram();
+                gl.attachShader(program, vs);
+                gl.attachShader(program, fs);
+                gl.linkProgram(program);
+                return program;
+            }
+
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                if (!result) return [0.04, 0.14, 0.2];
+                return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
+            }
+
+            let bgGl, bgProgram, bgUniforms = {};
+
+            const bgVsSource = `#version 300 es
+            in vec2 position;
+            void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+            const bgFsSource = `#version 300 es
+            precision highp float;
+            uniform vec2 iResolution; uniform float iTime; uniform float uSpeed; uniform float uSweepSpeed;
+            uniform float uSweepWidth; uniform float uSweepFalloff; uniform float uScale; uniform float uFrequency;
+            uniform float uRipple; uniform float uBandDensity; uniform float uLineSharpness; uniform float uGlow;
+            uniform float uColorSpread; uniform float uBrightness; uniform float uContrast; uniform float uSoftness;
+            uniform float uVignette; uniform float uOpacity; uniform float uScanline; uniform float uGrain;
+            uniform float uGrainIntensity; uniform float uDirection; uniform vec2 uMouse; uniform float uMouseEnabled;
+            uniform float uMouseRadius; uniform float uMouseStrength; uniform float uMouseActive;
+            uniform vec3 uColor1; uniform vec3 uColor2; uniform vec3 uColor3;
+            out vec4 fragColor;
+            const float TAU = 6.2831853;
+
+            float signalField(vec2 p, float t) {
+                float w = sin(p.x * 1.3 + t * 0.7) + sin(p.y * 1.7 - t * 0.52) * 0.8 + sin((p.x + p.y) * 0.9 + t * 0.91) * 0.6 + sin((p.x - p.y) * 1.53 - t * 0.63) * 0.42;
+                return w * 0.35;
+            }
+
+            vec3 palette(float f) {
+                f = pow(clamp(f, 0.0, 1.0), uContrast);
+                vec3 c = mix(uColor1, uColor2, smoothstep(0.08, 0.6, f));
+                return mix(c, uColor3, smoothstep(0.68, 1.0, f));
+            }
+
+            float scanBand(float x, float aa, float sharp) { return pow(mix(0.5, 0.5 + 0.5 * cos(x * TAU), aa), sharp); }
+
+            void main() {
+                float aspect = iResolution.x / max(iResolution.y, 1.0);
+                vec2 uv0 = (gl_FragCoord.xy * 2.0 - iResolution.xy) / iResolution.y;
+                vec2 p = uv0 / max(uScale, 0.001);
+                float t = iTime * uSpeed;
+                float mouseBoost = 0.0;
+                if (uMouseEnabled > 0.5) {
+                    vec2 mUv = vec2((uMouse.x * 2.0 - 1.0) * aspect, uMouse.y * 2.0 - 1.0);
+                    mouseBoost = exp(-dot(uv0 - mUv, uv0 - mUv) / pow(max(uMouseRadius, 0.001), 2.0)) * uMouseStrength * uMouseActive;
+                }
+                float axis = uDirection < 0.5 ? p.y : (uDirection < 1.5 ? p.x : (p.x + p.y) * 0.70710678);
+                float sig = signalField(p * uFrequency, t);
+                float coord = axis + sig * uRipple;
+                float phase = coord / max(uSweepWidth, 0.05) - t * uSweepSpeed;
+                float sweep = pow(0.5 + 0.5 * cos(phase * TAU), max(uSweepFalloff, 0.1));
+                float lc = coord * uBandDensity;
+                float aa = clamp(1.0 / (1.0 + uSoftness * fwidth(lc) * 3.0) * (1.0 + mouseBoost * 0.6), 0.0, 1.0);
+                float bodyBase = clamp(0.5 + 0.5 * sig, 0.0, 1.0);
+                float body = bodyBase * bodyBase * uGlow * sweep;
+                float split = uColorSpread * 0.16, sharp = max(uLineSharpness, 0.1);
+                float fr = clamp(scanBand(lc + split, aa, sharp) * sweep + body, 0.0, 1.0);
+                float fg = clamp(scanBand(lc, aa, sharp) * sweep + body, 0.0, 1.0);
+                float fb = clamp(scanBand(lc - split, aa, sharp) * sweep + body, 0.0, 1.0);
+                float inten = clamp((fr + fg + fb) * 0.3333333 * uBrightness * (1.0 + mouseBoost * 0.9), 0.0, 1.0);
+                if (uScanline > 0.5) inten *= 1.0 - 0.18 * (0.5 + 0.5 * cos(gl_FragCoord.y * 1.7));
+                if (uGrain > 0.5) inten += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233)) + iTime) * 43758.5453) - 0.5) * uGrainIntensity;
+                inten = clamp(inten * clamp(1.0 - uVignette * smoothstep(0.55, 1.65, length(uv0)), 0.0, 1.0), 0.0, 1.0);
+                float a = clamp(inten * uOpacity, 0.0, 1.0);
+                vec3 baseBg = vec3(0.0078, 0.0196, 0.0314);
+                vec3 waveColor = clamp(vec3(palette(fr).r, palette(fg).g, palette(fb).b), 0.0, 1.0);
+                fragColor = vec4(mix(baseBg, waveColor, a), 1.0);
+            }`;
+
+            function initBackgroundScanner() {
+                try {
+                    bgGl = bgCanvas.getContext('webgl2', { alpha: false, antialias: false });
+                    if (!bgGl) return;
+                    bgProgram = createProgram(bgGl, bgVsSource, bgFsSource);
+                    if (!bgProgram) return;
+                    bgGl.useProgram(bgProgram);
+
+                    const positions = new Float32Array([-1, -1, 3, -1, -1, 3]);
+                    const vbo = bgGl.createBuffer();
+                    bgGl.bindBuffer(bgGl.ARRAY_BUFFER, vbo);
+                    bgGl.bufferData(bgGl.ARRAY_BUFFER, positions, bgGl.STATIC_DRAW);
+
+                    const posLoc = bgGl.getAttribLocation(bgProgram, 'position');
+                    bgGl.enableVertexAttribArray(posLoc);
+                    bgGl.vertexAttribPointer(posLoc, 2, bgGl.FLOAT, false, 0, 0);
+
+                    const getU = name => bgGl.getUniformLocation(bgProgram, name);
+                    bgUniforms = {
+                        iResolution: getU('iResolution'), iTime: getU('iTime'), uSpeed: getU('uSpeed'), uSweepSpeed: getU('uSweepSpeed'),
+                        uSweepWidth: getU('uSweepWidth'), uSweepFalloff: getU('uSweepFalloff'), uScale: getU('uScale'), uFrequency: getU('uFrequency'),
+                        uRipple: getU('uRipple'), uBandDensity: getU('uBandDensity'), uLineSharpness: getU('uLineSharpness'), uGlow: getU('uGlow'),
+                        uColorSpread: getU('uColorSpread'), uBrightness: getU('uBrightness'), uContrast: getU('uContrast'), uSoftness: getU('uSoftness'),
+                        uVignette: getU('uVignette'), uOpacity: getU('uOpacity'), uScanline: getU('uScanline'), uGrain: getU('uGrain'),
+                        uGrainIntensity: getU('uGrainIntensity'), uDirection: getU('uDirection'), uMouse: getU('uMouse'), uMouseEnabled: getU('uMouseEnabled'),
+                        uMouseRadius: getU('uMouseRadius'), uMouseStrength: getU('uMouseStrength'), uMouseActive: getU('uMouseActive'),
+                        uColor1: getU('uColor1'), uColor2: getU('uColor2'), uColor3: getU('uColor3')
+                    };
+
+                    bgGl.uniform1f(bgUniforms.uSpeed, 0.45);
+                    bgGl.uniform1f(bgUniforms.uSweepSpeed, 0.2);
+                    bgGl.uniform1f(bgUniforms.uSweepWidth, 1.6);
+                    bgGl.uniform1f(bgUniforms.uSweepFalloff, 5.0);
+                    bgGl.uniform1f(bgUniforms.uScale, 1.5);
+                    bgGl.uniform1f(bgUniforms.uFrequency, 2.0);
+                    bgGl.uniform1f(bgUniforms.uRipple, 0.22);
+                    bgGl.uniform1f(bgUniforms.uBandDensity, 10.0);
+                    bgGl.uniform1f(bgUniforms.uLineSharpness, 5.0);
+                    bgGl.uniform1f(bgUniforms.uGlow, 0.25);
+                    bgGl.uniform1f(bgUniforms.uColorSpread, 0.65);
+                    bgGl.uniform1f(bgUniforms.uBrightness, 1.0);
+                    bgGl.uniform1f(bgUniforms.uContrast, 1.1);
+                    bgGl.uniform1f(bgUniforms.uSoftness, 1.3);
+                    bgGl.uniform1f(bgUniforms.uVignette, 0.5);
+                    bgGl.uniform1f(bgUniforms.uOpacity, 0.95);
+                    bgGl.uniform1f(bgUniforms.uScanline, 1.0);
+                    bgGl.uniform1f(bgUniforms.uGrain, 1.0);
+                    bgGl.uniform1f(bgUniforms.uGrainIntensity, 0.04);
+                    bgGl.uniform1f(bgUniforms.uDirection, 0.0);
+                    bgGl.uniform1f(bgUniforms.uMouseEnabled, 1.0);
+                    bgGl.uniform1f(bgUniforms.uMouseRadius, 0.45);
+                    bgGl.uniform1f(bgUniforms.uMouseStrength, 0.45);
+
+                    const c1 = hexToRgb('#06141F'), c2 = hexToRgb('#20526B'), c3 = hexToRgb('#3AAFA9');
+                    bgGl.uniform3f(bgUniforms.uColor1, c1[0], c1[1], c1[2]);
+                    bgGl.uniform3f(bgUniforms.uColor2, c2[0], c2[1], c2[2]);
+                    bgGl.uniform3f(bgUniforms.uColor3, c3[0], c3[1], c3[2]);
+                } catch(e) {}
+            }
+
+            let logoGl, logoProgram, logoUniforms = {}, logoTexture;
+
+            const logoVsSource = `#version 300 es
+            in vec2 position; in vec2 uv; out vec2 vUv;
+            void main() { vUv = uv; gl_Position = vec4(position, 0.0, 1.0); }`;
+
+            const logoFsSource = `#version 300 es
+            precision highp float;
+            uniform sampler2D uTextTexture; uniform vec2 uResolution; uniform vec2 uPointer;
+            uniform float uPointerActive; uniform float uTime; uniform float uWarpStrength;
+            uniform float uWarpScale; uniform float uSpeed; uniform float uPointerInfluence;
+            uniform float uPointerStrength; uniform float uRefraction; uniform float uRipple; uniform float uMotion;
+            in vec2 vUv; out vec4 fragColor;
+
+            float hash(vec2 p) {
+                p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y);
+            }
+            float noise(vec2 p) {
+                vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+                return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+            }
+            float fbm(vec2 p) {
+                float v = 0.0, a = 0.5;
+                for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.02; a *= 0.5; }
+                return v;
+            }
+            vec4 sampleText(vec2 uv) {
+                if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return vec4(0.0);
+                return texture(uTextTexture, uv);
+            }
+
+            void main() {
+                vec2 uv = vUv; float aspect = uResolution.x / max(uResolution.y, 1.0); float time = uTime * uSpeed;
+                float scale = max(uWarpScale, 0.001); vec2 drift = vec2(time * 0.055, -time * 0.045);
+                vec2 ambient = (vec2(fbm(uv * scale * 3.1 + drift), fbm((uv + 19.17) * scale * 3.4 - drift.yx)) - 0.5) * uWarpStrength * 0.045 * uMotion;
+                vec2 pDelta = uv - uPointer; vec2 aDelta = vec2(pDelta.x * aspect, pDelta.y);
+                float dist = length(aDelta), radius = max(uPointerInfluence, 0.001);
+                float t = clamp(dist / radius, 0.0, 1.0), lens = smoothstep(radius, 0.0, dist) * uPointerActive;
+                float bulge = t * (1.0 - t) * (1.0 - t) * 6.75 * uPointerActive;
+                vec2 dir = dist > 0.0001 ? vec2(aDelta.x / aspect, aDelta.y) / dist : vec2(0.0);
+                vec2 pWarp = -dir * bulge * uPointerStrength * 0.045 + dir * ((sin(dist * 28.0 - time * 4.2) * 0.5 + 0.5) - 0.5) * uRipple * bulge * uPointerStrength * 0.016;
+                vec2 d = uv + ambient + pWarp;
+                vec2 sDir = ambient + pWarp; float sLen = length(sDir);
+                vec2 split = (sLen > 0.00001 ? sDir / sLen : vec2(0.7071)) * uRefraction * 0.16 * (0.35 + lens * 1.65);
+                vec4 base = sampleText(d);
+                fragColor = vec4(vec3(sampleText(d + split).r, base.g, sampleText(d - split).b) + lens * base.a * 0.055, max(max(sampleText(d + split).a, base.a), sampleText(d - split).a));
+            }`;
+
+            function initLogoWarpEffect() {
+                try {
+                    logoGl = logoWarpCanvas.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: false });
+                    if (!logoGl) return;
+
+                    logoProgram = createProgram(logoGl, logoVsSource, logoFsSource);
+                    if (!logoProgram) return;
+
+                    logoGl.useProgram(logoProgram);
+
+                    const positionsUV = new Float32Array([
+                        -1, -1, 0, 0,  1, -1, 1, 0,  -1, 1, 0, 1,
+                        -1,  1, 0, 1,  1, -1, 1, 0,   1, 1, 1, 1
+                    ]);
+
+                    const vbo = logoGl.createBuffer();
+                    logoGl.bindBuffer(logoGl.ARRAY_BUFFER, vbo);
+                    logoGl.bufferData(logoGl.ARRAY_BUFFER, positionsUV, logoGl.STATIC_DRAW);
+
+                    const posLoc = logoGl.getAttribLocation(logoProgram, 'position');
+                    const uvLoc = logoGl.getAttribLocation(logoProgram, 'uv');
+                    logoGl.enableVertexAttribArray(posLoc); logoGl.vertexAttribPointer(posLoc, 2, logoGl.FLOAT, false, 16, 0);
+                    logoGl.enableVertexAttribArray(uvLoc); logoGl.vertexAttribPointer(uvLoc, 2, logoGl.FLOAT, false, 16, 8);
+
+                    const getU = name => logoGl.getUniformLocation(logoProgram, name);
+                    logoUniforms = {
+                        uTextTexture: getU('uTextTexture'), uResolution: getU('uResolution'), uPointer: getU('uPointer'),
+                        uPointerActive: getU('uPointerActive'), uTime: getU('uTime'), uWarpStrength: getU('uWarpStrength'),
+                        uWarpScale: getU('uWarpScale'), uSpeed: getU('uSpeed'), uPointerInfluence: getU('uPointerInfluence'),
+                        uPointerStrength: getU('uPointerStrength'), uRefraction: getU('uRefraction'), uRipple: getU('uRipple'), uMotion: getU('uMotion')
+                    };
+
+                    logoTexture = logoGl.createTexture();
+                    logoGl.bindTexture(logoGl.TEXTURE_2D, logoTexture);
+                    logoGl.texParameteri(logoGl.TEXTURE_2D, logoGl.TEXTURE_WRAP_S, logoGl.CLAMP_TO_EDGE);
+                    logoGl.texParameteri(logoGl.TEXTURE_2D, logoGl.TEXTURE_WRAP_T, logoGl.CLAMP_TO_EDGE);
+                    logoGl.texParameteri(logoGl.TEXTURE_2D, logoGl.TEXTURE_MIN_FILTER, logoGl.LINEAR);
+                    logoGl.texParameteri(logoGl.TEXTURE_2D, logoGl.TEXTURE_MAG_FILTER, logoGl.LINEAR);
+
+                    logoGl.uniform1f(logoUniforms.uWarpStrength, 0.08);
+                    logoGl.uniform1f(logoUniforms.uWarpScale, 1.7);
+                    logoGl.uniform1f(logoUniforms.uSpeed, 0.55);
+                    logoGl.uniform1f(logoUniforms.uPointerInfluence, 0.42);
+                    logoGl.uniform1f(logoUniforms.uPointerStrength, 0.38);
+                    logoGl.uniform1f(logoUniforms.uRefraction, 0.018);
+                    logoGl.uniform1f(logoUniforms.uRipple, 1.0);
+                    logoGl.uniform1f(logoUniforms.uMotion, 1.0);
+                    logoGl.uniform1i(logoUniforms.uTextTexture, 0);
+                } catch(e) {}
+            }
+
+            function resizeAll() {
+                const w = window.innerWidth, h = window.innerHeight;
+                const isMobile = w < 768;
+                const dpr = isMobile ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 2);
+                slideWidth = w;
+
+                if (bgGl && bgCanvas) {
+                    bgCanvas.width = Math.floor(w * dpr); bgCanvas.height = Math.floor(h * dpr);
+                    bgGl.viewport(0, 0, bgCanvas.width, bgCanvas.height);
+                    if (bgUniforms.iResolution) { bgGl.useProgram(bgProgram); bgGl.uniform2f(bgUniforms.iResolution, bgCanvas.width, bgCanvas.height); }
+                }
+
+                if (logoWarpCanvas) {
+                    logoWarpCanvas.width = Math.floor(w * dpr); 
+                    logoWarpCanvas.height = Math.floor(h * dpr);
+                    if (logoGl) {
+                        logoGl.viewport(0, 0, logoWarpCanvas.width, logoWarpCanvas.height);
+                        logoGl.useProgram(logoProgram);
+                        logoGl.uniform2f(logoUniforms.uResolution, logoWarpCanvas.width, logoWarpCanvas.height);
+                    }
+                    offscreenLogoCanvas.width = logoWarpCanvas.width; 
+                    offscreenLogoCanvas.height = logoWarpCanvas.height;
+                    shineCanvas.width = logoWarpCanvas.width; 
+                    shineCanvas.height = logoWarpCanvas.height;
+                }
+            }
+            window.addEventListener('resize', resizeAll);
+
+            function renderOffscreenLogo() {
+                const w = offscreenLogoCanvas.width, h = offscreenLogoCanvas.height;
+                logoCtx.clearRect(0, 0, w, h);
+
+                if (!hasBaseImage || !logoBase.naturalWidth) return;
+
+                const isMobile = window.innerWidth < 768;
+                // Width-based responsive scale that expands smoothly on mobile
+                // while strictly maintaining desktop scaling.
+                const vw = window.innerWidth;
+                const scaleT = Math.min(1, Math.max(0, (vw - 320) / (1024 - 320)));
+                const widthResponsiveFactor = isMobile ? 0.94 : (0.62 + scaleT * (0.95 - 0.62));
+                const baseTargetScale = logoPositionState.currentScale * widthResponsiveFactor;
+                const natW = logoBase.naturalWidth;
+                const natH = logoBase.naturalHeight;
+
+                // Enforce safety limits so the logo never touches or overflows canvas borders
+                const maxSafeWidthRatio = isMobile ? 0.92 : 0.88;
+                const maxSafeHeightRatio = isMobile ? 0.85 : 0.82;
+                const scale = Math.min(
+                    (w * baseTargetScale) / natW, 
+                    (h * baseTargetScale) / natH,
+                    (w * maxSafeWidthRatio) / natW,
+                    (h * maxSafeHeightRatio) / natH
+                );
+                const drawW = natW * scale, drawH = natH * scale;
+
+                // Clamp drawX and drawY with a dedicated edge margin
+                const sideMargin = isMobile ? w * 0.04 : w * 0.035;
+                const rawDrawX = (w * logoPositionState.currentX) - (drawW / 2);
+                const rawDrawY = (h * logoPositionState.currentY) - (drawH / 2);
+                const drawX = Math.max(sideMargin, Math.min(w - drawW - sideMargin, rawDrawX));
+                const drawY = Math.max(12, Math.min(h - drawH - 12, rawDrawY));
+
+                const scaleX = drawW / natW;
+                const scaleY = drawH / natH;
+                const currentLensCenterX = drawX + lensCenter.x * scaleX;
+                const currentLensCenterY = drawY + lensCenter.y * scaleY;
+
+                // Draw Base
+                logoCtx.drawImage(logoBase, drawX, drawY, drawW, drawH);
+
+                // Draw Rotating Lens only when the decorative asset loaded.
+                if (hasLensImage && logoLens.naturalWidth > 0) {
+                    const activeRotSpeed = isHovered ? 0.012 : 0.0035;
+                    currentAngle += activeRotSpeed;
+                    logoCtx.save();
+                    logoCtx.translate(currentLensCenterX, currentLensCenterY);
+                    logoCtx.rotate(currentAngle);
+                    logoCtx.translate(-currentLensCenterX, -currentLensCenterY);
+                    logoCtx.drawImage(logoLens, drawX, drawY, drawW, drawH);
+                    logoCtx.restore();
+                }
+
+                // Draw Dynamic Interactive Shine
+                if (isHovered || shineAlpha > 0.01) {
+                    if (isHovered) {
+                        shineAlpha = Math.min(1, shineAlpha + 0.12);
+                        shineProgress += (shineSpeed * 1.5);
+                        if (shineProgress > 1.8) shineProgress = -0.5;
+                    } else {
+                        shineAlpha = Math.max(0, shineAlpha - 0.05);
+                        shineProgress += shineSpeed;
+                    }
+
+                    if (shineAlpha > 0) {
+                        const shineWidth = drawW * 0.45;
+                        const currentX = drawX + shineProgress * (drawW + shineWidth) - shineWidth;
+
+                        const gradient = shineCtx.createLinearGradient(
+                            currentX, drawY, 
+                            currentX + shineWidth, drawY + drawH
+                        );
+                        
+                        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                        gradient.addColorStop(0.2, 'rgba(15, 30, 40, 0.75)');
+                        gradient.addColorStop(0.5, 'rgba(100, 223, 223, 0.95)');
+                        gradient.addColorStop(0.8, 'rgba(15, 30, 40, 0.75)');
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                        shineCtx.clearRect(0, 0, w, h);
+                        shineCtx.globalCompositeOperation = 'source-over';
+                        shineCtx.fillStyle = gradient;
+                        shineCtx.fillRect(drawX, drawY, drawW, drawH);
+
+                        shineCtx.globalCompositeOperation = 'destination-in';
+                        shineCtx.drawImage(logoBase, drawX, drawY, drawW, drawH);
+
+                        logoCtx.save();
+                        logoCtx.globalAlpha = shineAlpha * 0.85;
+                        logoCtx.globalCompositeOperation = 'source-over';
+                        logoCtx.drawImage(shineCanvas, 0, 0);
+                        logoCtx.restore();
+                    }
+                } else {
+                    shineProgress = -0.5;
+                }
+            }
+
+            function setupTextSpans() {
+                [document.getElementById('animatedText1'), document.getElementById('animatedText2')].forEach(p => {
+                    if (!p || !p.innerText) return;
+                    const words = p.innerText.trim().split(/\s+/);
+                    p.innerHTML = words.map(w => `<span class="word-span">${w}</span>`).join(' ');
+                });
+            }
+
+            function updateCinematicTextReveal() {
+                const triggerPoint = window.innerHeight * 0.8;
+                ['card1', 'card2'].forEach(cardId => {
+                    const card = document.getElementById(cardId);
+                    if (!card) return;
+                    const rect = card.getBoundingClientRect();
+                    const spans = card.querySelectorAll('.word-span');
+
+                    if (rect.top < triggerPoint && rect.bottom > 0) {
+                        const progress = Math.min(1, Math.max(0, (triggerPoint - rect.top) / (rect.height * 0.8)));
+                        const visibleCount = Math.floor(progress * spans.length);
+                        spans.forEach((span, i) => span.classList.toggle('visible', i <= visibleCount));
+                    } else if (rect.top >= triggerPoint) {
+                        spans.forEach(span => span.classList.remove('visible'));
+                    }
+                });
+            }
+
+            function updateScrollAndGalleryState() {
+                const t1Section = document.getElementById('textSection1');
+                const t2Section = document.getElementById('textSection2');
+                const finalSec = document.getElementById('finalSection');
+                const gSection = galleryTriggerSection;
+
+                const t1Rect = t1Section ? t1Section.getBoundingClientRect() : { top: 9999 };
+                const t2Rect = t2Section ? t2Section.getBoundingClientRect() : { top: 9999 };
+                const finalRect = finalSec ? finalSec.getBoundingClientRect() : { top: 9999 };
+                const gRect = gSection ? gSection.getBoundingClientRect() : { top: 9999, height: 1 };
+                
+                const vh = window.innerHeight;
+                const scrollPosition = window.scrollY || window.pageYOffset;
+                const galleryTop = gSection ? (gRect.top + scrollPosition) : 0;
+                const galleryHeight = gSection ? gSection.offsetHeight : 1;
+
+                const galleryStart = galleryTop;
+                const galleryEnd = galleryTop + galleryHeight - vh;
+
+                const galleryProgress = Math.max(0, Math.min(1, (scrollPosition - galleryStart) / Math.max(1, galleryEnd - galleryStart)));
+
+                const entry = 0.06;
+                const exit = 0.94;
+                let rawOpacity = 0;
+                let overlayScale = 1;
+
+                if (galleryProgress <= entry) {
+                    const p = Math.max(0, Math.min(1, galleryProgress / entry));
+                    rawOpacity = p;
+                    overlayScale = 1.03 - (p * 0.03);
+                } else if (galleryProgress < exit) {
+                    rawOpacity = 1;
+                    overlayScale = 1;
+                } else {
+                    const p = Math.max(0, Math.min(1, (galleryProgress - exit) / (1 - exit)));
+                    rawOpacity = 1 - p;
+                    overlayScale = 1;
+                }
+
+                const overlayOpacity = Math.max(0, Math.min(0.95, rawOpacity));
+                const isActiveThreshold = galleryProgress > 0 && galleryProgress < 1 && (gRect.top < vh && gRect.bottom > 0);
+
+                if (isActiveThreshold) {
+                    galleryOverlay.style.display = 'block';
+                    galleryOverlay.style.opacity = Math.max(0.01, overlayOpacity).toFixed(3);
+                    galleryOverlay.style.pointerEvents = overlayOpacity > 0.05 ? 'auto' : 'none';
+                    if (galleryBackdropVeil) {
+                        galleryBackdropVeil.style.display = 'block';
+                        galleryBackdropVeil.style.opacity = overlayOpacity.toFixed(3);
+                    }
+                } else {
+                    galleryOverlay.style.display = 'none';
+                    galleryOverlay.style.opacity = '0';
+                    galleryOverlay.style.pointerEvents = 'none';
+                    if (galleryBackdropVeil) {
+                        galleryBackdropVeil.style.display = 'none';
+                        galleryBackdropVeil.style.opacity = '0';
+                    }
+                }
+
+                const galleryProgressHorizontal = Math.max(0, Math.min(1, (galleryProgress - entry) / Math.max(0.001, exit - entry)));
+                const maxTrackDistance = (totalSlides - 1) * slideWidth;
+                targetTrackX = -(galleryProgressHorizontal * maxTrackDistance);
+                currentTrackX += (targetTrackX - currentTrackX) * 0.16;
+                galleryTrack.style.transform = `translate3d(${currentTrackX.toFixed(2)}px, 0, 0)`;
+
+                const slideElements = galleryTrack.children;
+                for (let i = 0; i < slideElements.length; i++) {
+                    const slideImg = slideElements[i].querySelector('.slide-img');
+                    if (slideImg) {
+                        slideImg.style.transform = 'translate3d(0, 0, 0)';
+                    }
+                }
+
+                const computedIndex = Math.min(totalSlides - 1, Math.max(0, Math.round(galleryProgressHorizontal * (totalSlides - 1))));
+                if (computedIndex !== activeSlideIndex) {
+                    activeSlideIndex = computedIndex;
+                    if (galleryDotsContainer) {
+                        Array.from(galleryDotsContainer.children).forEach((btn, idx) => {
+                            const pill = btn.querySelector('.gallery-dot-pill');
+                            if (pill) {
+                                pill.className = idx === activeSlideIndex 
+                                    ? 'gallery-dot-pill active' 
+                                    : 'gallery-dot-pill inactive';
+                            }
+                        });
+                    }
+                }
+
+                const isMobileOrTablet = window.innerWidth < 1024;
+                if (isMobileOrTablet) {
+                    if (gRect.top < vh * 0.5 && galleryProgress < 0.95) {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.88;
+                    } else if (t1Rect.top < vh * 0.8 && gRect.top >= vh * 0.5) {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.88; 
+                    } else if (t2Rect.top <= vh * 0.75 && finalRect.top > vh * 0.3) {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.88;
+                    } else if (finalRect.top <= vh * 0.7) {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.92;
+                    } else {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.90;
+                    }
+                } else {
+                    if (gRect.top < vh * 0.5 && galleryProgress < 0.95) {
+                        logoPositionState.targetX = 0.22; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.5;
+                    } else if (t1Rect.top < vh * 0.8 && gRect.top >= vh * 0.5) {
+                        logoPositionState.targetX = 0.22; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.5; 
+                    } else if (t2Rect.top <= vh * 0.75 && finalRect.top > vh * 0.3) {
+                        logoPositionState.targetX = 0.78; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.5;
+                    } else if (finalRect.top <= vh * 0.7) {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.75;
+                    } else {
+                        logoPositionState.targetX = 0.5; logoPositionState.targetY = 0.5; logoPositionState.targetScale = 0.7;
+                    }
+                }
+
+                const committeeSection = document.getElementById('committeeSection');
+                const isCommLocked = !committeeSection || committeeSection.classList.contains('committee-locked');
+                const commRect = (!isCommLocked && committeeSection) ? committeeSection.getBoundingClientRect() : null;
+
+                if (logoWarpCanvas) {
+                    if (commRect && commRect.top < vh) {
+                        const commFade = Math.max(0, Math.min(1, commRect.top / (vh * 0.65)));
+                        logoWarpCanvas.style.opacity = commFade.toFixed(3);
+                    } else {
+                        logoWarpCanvas.style.opacity = '1';
+                    }
+                }
+
+                logoPositionState.currentX += (logoPositionState.targetX - logoPositionState.currentX) * 0.08;
+                logoPositionState.currentY += (logoPositionState.targetY - logoPositionState.currentY) * 0.08;
+                logoPositionState.currentScale += (logoPositionState.targetScale - logoPositionState.currentScale) * 0.08;
+            }
+
+            const t0 = performance.now();
+
+            function masterRenderLoop(now) {
+                const timeSec = (now - t0) * 0.001;
+
+                updateScrollAndGalleryState();
+                updateCinematicTextReveal();
+
+                currentSpotX += (mouseClientX - currentSpotX) * 0.22;
+                currentSpotY += (mouseClientY - currentSpotY) * 0.22;
+
+                const idleX = 0.5 + Math.sin(timeSec * 0.33) * 0.1;
+                const idleY = 0.5 + Math.cos(timeSec * 0.27) * 0.08;
+                const targetX = pointer.activeTarget > 0 ? pointer.tx : idleX;
+                const targetY = pointer.activeTarget > 0 ? pointer.ty : idleY;
+                const damping = pointer.activeTarget > 0 ? 0.12 : 0.035;
+
+                pointer.x += (targetX - pointer.x) * damping;
+                pointer.y += (targetY - pointer.y) * damping;
+                pointer.active += ((pointer.activeTarget > 0 ? 1.0 : 0.18) - pointer.active) * 0.06;
+
+                if (bgGl && bgProgram) {
+                    try {
+                        bgGl.useProgram(bgProgram);
+                        bgGl.uniform1f(bgUniforms.iTime, timeSec);
+                        bgGl.uniform2f(bgUniforms.uMouse, pointer.x, pointer.y);
+                        bgGl.uniform1f(bgUniforms.uMouseActive, pointer.active);
+                        bgGl.clearColor(0.0078, 0.0196, 0.0314, 1.0);
+                        bgGl.clear(bgGl.COLOR_BUFFER_BIT);
+                        bgGl.drawArrays(bgGl.TRIANGLES, 0, 3);
+                    } catch(e) {}
+                }
+
+                if (logoGl && logoProgram) {
+                    try {
+                        renderOffscreenLogo();
+                        logoGl.useProgram(logoProgram);
+                        logoGl.activeTexture(logoGl.TEXTURE0);
+                        logoGl.bindTexture(logoGl.TEXTURE_2D, logoTexture);
+                        logoGl.pixelStorei(logoGl.UNPACK_FLIP_Y_WEBGL, true);
+                        logoGl.texImage2D(logoGl.TEXTURE_2D, 0, logoGl.RGBA, logoGl.RGBA, logoGl.UNSIGNED_BYTE, offscreenLogoCanvas);
+
+                        logoGl.uniform1i(logoUniforms.uTextTexture, 0);
+                        logoGl.uniform2f(logoUniforms.uPointer, pointer.x, pointer.y);
+                        logoGl.uniform1f(logoUniforms.uPointerActive, pointer.active);
+                        logoGl.uniform1f(logoUniforms.uTime, timeSec);
+
+                        logoGl.clearColor(0, 0, 0, 0);
+                        logoGl.clear(logoGl.COLOR_BUFFER_BIT);
+                        logoGl.drawArrays(logoGl.TRIANGLES, 0, 6);
+                    } catch(err) {}
+                }
+
+                requestAnimationFrame(masterRenderLoop);
+            }
+
+            const updatePointer = (clientX, clientY) => {
+                mouseClientX = clientX;
+                mouseClientY = clientY;
+                const cLight = document.getElementById('cursorLight');
+                if (cLight) {
+                    cLight.classList.remove('opacity-0');
+                    cLight.classList.add('opacity-100');
+
+                    clearTimeout(mouseMoveTimeout);
+                    mouseMoveTimeout = setTimeout(() => {
+                        if (!isHovered) cLight.classList.remove('opacity-100');
+                    }, 2000);
+                }
+
+                if (appContainer) {
+                    const rect = appContainer.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        pointer.tx = (clientX - rect.left) / rect.width;
+                        pointer.ty = 1.0 - (clientY - rect.top) / rect.height;
+                        pointer.activeTarget = 1;
+                    }
+                }
+            };
+
+            window.addEventListener('mousemove', e => {
+                isHovered = true;
+                updatePointer(e.clientX, e.clientY);
+            });
+
+            window.addEventListener('mouseleave', () => {
+                isHovered = false;
+                pointer.activeTarget = 0;
+                const cLight = document.getElementById('cursorLight');
+                if (cLight) cLight.classList.remove('opacity-100');
+            });
+
+            window.addEventListener('touchstart', e => {
+                isHovered = true;
+                if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', e => {
+                if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                isHovered = false;
+                pointer.activeTarget = 0;
+            });
+
+            initBackgroundScanner();
+            initLogoWarpEffect();
+            resizeAll();
+            setupTextSpans();
+            requestAnimationFrame(masterRenderLoop);
+        });
+    </script>
+
+    <!-- React & Babel Scripts for Themes and Committee -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@11.18.2/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const THEMES_DATA = [
+          { id: "colour", title: "COLOUR", number: "01", desc: "Vibrant and colorful photography that captures the beauty of our world in full spectrum.", ambientColor: "#030814", glowColor: "rgba(100, 223, 223, 0.45)", accent: "#64dfdf" },
+          { id: "mono", title: "MONO", number: "02", desc: "Black and white photography that tells powerful stories through contrast, shadow, and texture.", ambientColor: "#050505", glowColor: "rgba(220, 220, 230, 0.4)", accent: "#e2e8f0" },
+          { id: "mobile", title: "MOBILE", number: "03", desc: "Stunning images captured with mobile devices, proving great photography is in the visionary eye.", ambientColor: "#100602", glowColor: "rgba(255, 120, 40, 0.45)", accent: "#fb923c" },
+          { id: "wild", title: "WILD", number: "04", desc: "Photography that showcases animals in their natural habitat and the untamed beauty of wildlife.", ambientColor: "#020d06", glowColor: "rgba(40, 190, 100, 0.45)", accent: "#34d399" },
+          { id: "macro", title: "MACRO", number: "05", desc: "Extreme close-up photography capturing miniature details invisible to the naked human eye.", ambientColor: "#060910", glowColor: "rgba(160, 190, 240, 0.45)", accent: "#93c5fd" },
+          { id: "street", title: "STREET", number: "06", desc: "Authentic and candid moments from everyday life through the spontaneous lens of the street.", ambientColor: "#0e0303", glowColor: "rgba(240, 80, 80, 0.45)", accent: "#f87171" },
+          { id: "architecture", title: "ARCHITECTURE", number: "07", desc: "Creative images capturing the geometric craft of buildings, cityscapes, and man-made structures.", ambientColor: "#0f0e0c", glowColor: "rgba(240, 210, 170, 0.45)", accent: "#fde68a" }
+        ];
+
+        const EXECUTIVES_DESKTOP = [
+          { title: "ASST TREASURER", name: "DHARANA PILAPITIYA" },
+          { title: "VICE PRESIDENT", name: "SASIRU BANDARA" },
+          { title: "SECRETARY", name: "NADEV DASSANAYAKE" },
+          { title: "PRESIDENT", name: "SANDIL KOTTEGODA" },
+          { title: "TREASURER", name: "MATHEESHA BOGAHAWATTA" },
+          { title: "ASST SECRETARY", name: "DULAJ BANDARA" },
+          { title: "CHIEF ORGANIZER", name: "DINAL ATTANAYAKE" }
+        ];
+
+        const EXECUTIVES_MOBILE = [
+          { title: "PRESIDENT", name: "SANDIL KOTTEGODA" },
+          { title: "SECRETARY", name: "NADEV DASSANAYAKE" },
+          { title: "TREASURER", name: "MATHEESHA BOGAHAWATTA" },
+          { title: "VICE PRESIDENT", name: "SASIRU BANDARA" },
+          { title: "ASST SECRETARY", name: "DULAJ BANDARA" },
+          { title: "ASST TREASURER", name: "DHARANA PILAPITIYA" },
+          { title: "CHIEF ORGANIZER", name: "DINAL ATTANAYAKE" }
+        ];
+
+        const COMMITTEE_MEMBERS = [
+          { name: "GAMIRA WIJEKOON", role: "EDITOR" },
+          { name: "MANULA KEKULANDARA", role: "EDITOR" },
+          { name: "SANULA JAYASUNDARA", role: "MEDIA COORDINATOR" },
+          { name: "SAHIRU EKANAYAKE", role: "MEDIA COORDINATOR" },
+          { name: "VIMODH MALSHAN" },
+          { name: "CHARITH WELAGEDARA" },
+          { name: "KAWEESHWARA LEWLIYADDA" },
+          { name: "THIRAKSHA JAYASUNDARA" },
+          { name: "THEJANA PALLIYAGURU" },
+          { name: "ISARA KODIKARA" },
+          { name: "CHANITH GOONASEKARA" },
+          { name: "SENUL HETTIARACHCHI" },
+          { name: "SENIRU AMBEPITIYA" },
+          { name: "SENULA GALKOTUWA" },
+          { name: "LUSATH MALLAWARACHCHI" },
+          { name: "GAGANA KAVISHKA" },
+          { name: "LUSITH RAJAPAKSHE" },
+          { name: "LITHIL UDUWARA" },
+          { name: "DEVMIN DE SILVA" },
+          { name: "NEWAN MINSARA" }
+        ];
+
+        function UploadShortcut() {
+          const [show, setShow] = useState(false);
+
+          useEffect(() => {
+            try {
+              const visited = localStorage.getItem('speculo_visited');
+              if (visited === 'true') {
+                setShow(true);
+              } else {
+                // Set visited for future sessions
+                setTimeout(() => {
+                  try { localStorage.setItem('speculo_visited', 'true'); } catch(e) {}
+                }, 3000);
+              }
+            } catch(e) {}
+          }, []);
+
+          if (!show) return null;
+
+          return (
+            <a 
+              href="Submissions.html" 
+              id="speculoUploadShortcut"
+              aria-label="Direct Upload Entry Shortcut"
+              title="Upload Entry"
+              className="fixed top-6 right-6 sm:top-8 sm:right-10 z-40 group inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#03080d]/85 backdrop-blur-xl border border-[#64dfdf]/60 text-[#64dfdf] shadow-[0_0_20px_rgba(100,223,223,0.3)] hover:shadow-[0_0_35px_rgba(100,223,223,0.85)] hover:bg-[#64dfdf] hover:text-[#020508] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer no-underline"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2" className="transition-transform duration-300 group-hover:-translate-y-0.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </a>
+          );
+        }
+
+        function CommitteeUnlockArrow() {
+          const [isUnlocked, setIsUnlocked] = useState(() => Boolean(window.isCommitteeUnlocked));
+          const [isVisible, setIsVisible] = useState(false);
+
+          useEffect(() => {
+            const handleUnlocked = () => {
+              setIsUnlocked(true);
+              setIsVisible(false);
+            };
+
+            window.addEventListener('committee-unlocked', handleUnlocked);
+
+            const checkVisibility = () => {
+              if (window.isCommitteeUnlocked || isUnlocked) {
+                setIsVisible(false);
+                return;
+              }
+              const finalSec = document.getElementById('finalSection');
+              if (!finalSec) return;
+              const rect = finalSec.getBoundingClientRect();
+              const vh = window.innerHeight;
+              
+              // Visible when user reaches finalSection / Explore buttons area
+              if (rect.top <= vh * 0.9) {
+                setIsVisible(true);
+              } else {
+                setIsVisible(false);
+              }
+            };
+
+            window.addEventListener('scroll', checkVisibility, { passive: true });
+            window.addEventListener('resize', checkVisibility, { passive: true });
+            checkVisibility();
+
+            return () => {
+              window.removeEventListener('committee-unlocked', handleUnlocked);
+              window.removeEventListener('scroll', checkVisibility);
+              window.removeEventListener('resize', checkVisibility);
+            };
+          }, [isUnlocked]);
+
+          if (isUnlocked || !isVisible) return null;
+
+          const handleUnlock = (e) => {
+            if (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            if (typeof window.unlockCommittee === 'function') {
+              window.unlockCommittee();
+            }
+          };
+
+          return (
+            <button
+              id="committeeUnlockBtn"
+              onClick={handleUnlock}
+              aria-label="Unlock Executive Committee and Footer"
+              title="Unlock Executive Committee & Footer"
+              className="fixed bottom-5 left-4 sm:bottom-8 sm:left-8 z-50 group inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#03080d]/90 backdrop-blur-xl border border-[#64dfdf]/70 text-[#64dfdf] shadow-[0_0_25px_rgba(100,223,223,0.4)] hover:shadow-[0_0_40px_rgba(100,223,223,0.9)] hover:bg-[#64dfdf] hover:text-[#020508] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+            >
+              <div className="flex items-center justify-center animate-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </div>
+            </button>
+          );
+        }
+
+        function MainInteractionManager() {
+          const [isVisible, setIsVisible] = useState(false);
+
+          useEffect(() => {
+            const checkVisibility = () => {
+              const text2 = document.getElementById('textSection2');
+              const finalSec = document.getElementById('finalSection');
+              const committeeSec = document.getElementById('committeeSection');
+              const vh = window.innerHeight;
+
+              // Appear after the Sri Lanka box (textSection2)
+              if (text2) {
+                const rect2 = text2.getBoundingClientRect();
+                const pastSriLanka = rect2.top <= vh * 0.45;
+                
+                // Hide if scrolled deep into committee or footer
+                let underCommittee = false;
+                if (committeeSec && !committeeSec.classList.contains('committee-locked')) {
+                  const commRect = committeeSec.getBoundingClientRect();
+                  if (commRect.top < vh * 0.3) {
+                    underCommittee = true;
+                  }
+                }
+                setIsVisible(pastSriLanka && !underCommittee);
+              }
+            };
+
+            window.addEventListener('scroll', checkVisibility, { passive: true });
+            window.addEventListener('resize', checkVisibility, { passive: true });
+            checkVisibility();
+            return () => {
+              window.removeEventListener('scroll', checkVisibility);
+              window.removeEventListener('resize', checkVisibility);
+            };
+          }, []);
+
+          return (
+            <div 
+              className={`flex flex-row items-center justify-center gap-3 sm:gap-5 transition-all duration-700 ease-out transform ${
+                isVisible ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-6 scale-95 pointer-events-none'
+              }`}
+            >
+              {/* Cyn_Black EXPLORE THEMES Button */}
+              <a 
+                href="themes.html" 
+                aria-label="Explore Themes - Competition Themes"
+                className="group relative inline-flex items-center justify-center px-6 sm:px-9 py-3.5 sm:py-4 rounded-full bg-[#03080d]/90 backdrop-blur-xl border border-[#64dfdf]/70 text-[#64dfdf] font-mono font-bold text-[11px] sm:text-sm tracking-[0.18em] sm:tracking-[0.22em] uppercase shadow-[0_0_25px_rgba(100,223,223,0.35)] hover:shadow-[0_0_50px_rgba(100,223,223,0.85)] hover:bg-[#64dfdf] hover:text-[#020508] hover:border-[#64dfdf] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer no-underline overflow-hidden whitespace-nowrap"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#64dfdf]/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <span className="relative z-10">EXPLORE THEMES</span>
+              </a>
+
+              {/* Cyn_Black SUBMIT ENTRY Button */}
+              <a 
+                href="Submissions.html" 
+                aria-label="Submit Entry - Speculo Submissions"
+                className="group relative inline-flex items-center justify-center px-6 sm:px-9 py-3.5 sm:py-4 rounded-full bg-[#020508]/90 backdrop-blur-xl border border-white/35 text-white font-mono font-bold text-[11px] sm:text-sm tracking-[0.18em] sm:tracking-[0.22em] uppercase shadow-[0_0_20px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(100,223,223,0.6)] hover:border-[#64dfdf] hover:text-[#64dfdf] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer no-underline overflow-hidden whitespace-nowrap"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <span className="relative z-10">SUBMIT ENTRY</span>
+              </a>
+            </div>
+          );
+        }
+
+        function CommitteeApp() {
+          const [view, setView] = useState('summary');
+          const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+          useEffect(() => {
+            const onResize = () => setIsMobile(window.innerWidth < 1024);
+            window.addEventListener('resize', onResize);
+            return () => window.removeEventListener('resize', onResize);
+          }, []);
+
+          const currentExecutives = isMobile ? EXECUTIVES_MOBILE : EXECUTIVES_DESKTOP;
+
+          return (
+            <div className="w-full flex flex-col items-center justify-center transition-all duration-500">
+              <div className="w-full flex justify-between items-center py-1 px-2 md:px-4 z-30">
+                {view === 'team' && (
+                  <button onClick={() => setView('summary')} className="px-4 py-1.5 rounded-full border border-brand-teal/40 bg-brand-teal/10 hover:bg-brand-teal/20 text-brand-teal text-xs font-semibold tracking-wider transition-all cursor-pointer">
+                    ← BACK TO SUMMARY
+                  </button>
+                )}
+              </div>
+
+              {view === 'summary' && (
+                <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center py-2">
+                  {/* Leaders portrait: Full visibility without face cropping on desktop */}
+                  <div className="hidden md:flex lg:col-span-6 relative w-full h-[44vh] sm:h-[48vh] md:h-[54vh] items-end justify-center side-feather-mask overflow-hidden">
+                    <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/1.png" alt="Executive Leaders" className="w-full h-full object-contain object-bottom origin-bottom filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.95)]" />
+                  </div>
+                  <div className="lg:col-span-6 md:col-span-12 flex flex-col justify-center text-center lg:px-4">
+                    <div className="flex justify-center items-center -mb-4 relative z-10">
+                      <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/Logo%20White.png" alt="Rajans Photography Logo" className="h-28 sm:h-36 md:h-44 w-auto object-contain filter drop-shadow-[0_0_35px_rgba(100,223,223,0.85)]" />
+                    </div>
+                    <div className="space-y-1">
+                      <h1 className="font-sans tracking-[0.15em] text-xl sm:text-2xl md:text-3xl lg:text-[2.2rem] text-white glow-cyan leading-tight uppercase">
+                        <span className="block font-normal">EXECUTIVE</span>
+                        <span className="block font-bold">COMMITTEE</span>
+                      </h1>
+                      <h2 className="font-sans font-medium text-brand-teal tracking-[0.25em] text-xs sm:text-sm uppercase">FOR THE YEARS 2026/2027</h2>
+                    </div>
+                    <p className="font-sans font-light text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto my-3 text-justify px-2">
+                      Sandil Kottegoda and Nadev Dassanayake step forward with fresh vision, creativity, and dedication, carrying the legacy of Rajans Photography into a new chapter. With a passion for capturing meaningful moments and creating lasting memories, they lead the way toward a future shaped by creativity, purpose, and the art of photography.
+                    </p>
+                    <div className="flex justify-center mt-2">
+                      <button onClick={() => setView('team')} className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-brand-teal/80 to-brand-tealGlow/90 text-brand-dark font-bold text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(100,223,223,0.8)] cursor-pointer">
+                        <span>MEET THE TEAM</span>
+                        <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {view === 'team' && (
+                <div className="w-full flex flex-col items-center py-3">
+                  <div className="flex justify-center items-center -mb-3 relative z-10">
+                    <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/Logo%20White.png" alt="Rajans Photography Logo" className="h-20 sm:h-28 md:h-36 w-auto object-contain filter drop-shadow-[0_0_25px_rgba(100,223,223,0.7)]" />
+                  </div>
+                  <div className="text-center space-y-1 mb-3">
+                    <h1 className="font-sans tracking-[0.15em] text-lg sm:text-xl md:text-2xl text-white glow-cyan uppercase leading-tight">
+                      <span className="block font-normal">EXECUTIVE</span>
+                      <span className="block font-bold">COMMITTEE</span>
+                    </h1>
+                    <p className="font-sans font-medium text-brand-teal tracking-[0.2em] text-[10px] sm:text-xs uppercase">FOR THE YEARS 2026/2027</p>
+                  </div>
+                  <div className="relative w-full max-w-5xl h-[28vh] sm:h-[34vh] md:h-[40vh] flex items-end justify-center my-2 px-2">
+                    <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/2.png" alt="Executive Committee Full Group" className="w-full h-full object-contain object-bottom filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]" />
+                  </div>
+                  <div className="w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-brand-teal/50 to-transparent my-5"></div>
+                  {/* Executive Committee List */}
+                  <div className="w-[94vw] max-w-[1050px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 lg:gap-0 z-20">
+                    {currentExecutives.map((exec, idx) => (
+                      <div key={idx} className="exec-item relative text-center px-1 py-1.5 lg:py-0 rounded-lg lg:rounded-none bg-brand-card/30 lg:bg-transparent border border-brand-teal/10 lg:border-0">
+                        <div className="font-sans font-semibold tracking-wider text-[10px] sm:text-[9.5px] md:text-[10.5px] uppercase leading-tight text-brand-teal">{exec.title}</div>
+                        <div className="font-sans text-[12px] sm:text-[11px] md:text-[13px] tracking-tight mt-0.5 leading-tight text-slate-100 font-bold">{exec.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="w-full max-w-5xl mt-6 px-4 text-center">
+                    <h3 className="font-sans font-bold tracking-[0.2em] text-brand-teal text-xs sm:text-sm uppercase mb-3 glow-cyan">COMMITTEE MEMBERS</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 text-slate-300 text-[11px] sm:text-xs">
+                      {COMMITTEE_MEMBERS.map((member, idx) => (
+                        <div key={idx} className="py-1.5 px-2 rounded bg-brand-card/40 border border-brand-teal/10 font-medium text-slate-200">
+                          <div>{member.name}</div>
+                          {member.role && <div className="text-[9px] text-brand-teal uppercase font-semibold mt-0.5">{member.role}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        window.isCommitteeUnlocked = false;
+
+        window.unlockCommittee = function() {
+          window.isCommitteeUnlocked = true;
+          var commSec = document.getElementById('committeeSection');
+          var footerEl = document.getElementById('mainFooter');
+          if (commSec) {
+            commSec.classList.remove('committee-locked');
+            commSec.style.display = '';
+          }
+          if (footerEl) {
+            footerEl.classList.remove('committee-locked');
+            footerEl.style.display = '';
+          }
+          window.dispatchEvent(new CustomEvent('committee-unlocked'));
+          
+          setTimeout(function() {
+            var targetEl = document.getElementById('committeeSection');
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              var targetY = targetEl.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+              window.scrollTo({ top: targetY, behavior: 'smooth' });
+            }
+          }, 80);
+        };
+
+        const uploadShortcutRootEl = document.getElementById('logoUploadShortcutRoot');
+        if (uploadShortcutRootEl) ReactDOM.createRoot(uploadShortcutRootEl).render(<UploadShortcut />);
+
+        const unlockBtnRootEl = document.getElementById('committeeUnlockButtonRoot');
+        if (unlockBtnRootEl) ReactDOM.createRoot(unlockBtnRootEl).render(<CommitteeUnlockArrow />);
+
+        const actionBtnRootEl = document.getElementById('finalActionButtonsRoot');
+        if (actionBtnRootEl) ReactDOM.createRoot(actionBtnRootEl).render(<MainInteractionManager />);
+
+        const committeeRootEl = document.getElementById('committeeRoot');
+        if (committeeRootEl) ReactDOM.createRoot(committeeRootEl).render(<CommitteeApp />);
+    </script>
+
+    <!-- Zero-Dependency Vanilla JS Hash Router & Navigation Link Engine -->
+    <script>
+      (function() {
+        function routeCurrentHash() {
+          var hash = (window.location.hash || '').replace(/^#/, '');
+          if (!hash) return;
+
+          var targetId = hash;
+          if (hash === 'about' || hash === 'legacy') targetId = 'textSection1';
+          if (hash === 'competition' || hash === 'competitionSection') targetId = 'textSection2';
+          if (hash === 'committee' || hash === 'committeeSection' || hash === 'committeeRoot' || hash === 'footer' || hash === 'mainFooter') {
+            if (typeof window.unlockCommittee === 'function') {
+              window.unlockCommittee();
+              return;
+            }
+            targetId = 'committeeSection';
+          }
+          if (hash === 'home' || hash === 'hero') targetId = 'heroSection';
+          if (hash === 'gallery' || hash === 'themes') targetId = 'galleryTriggerSection';
+
+          if (targetId === 'heroSection') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+
+          var targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        // Execute immediately and on future state updates
+        routeCurrentHash();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', routeCurrentHash);
+        }
+        window.addEventListener('load', function() {
+          routeCurrentHash();
+          setTimeout(routeCurrentHash, 250);
+          setTimeout(routeCurrentHash, 650);
+        });
+        window.addEventListener('hashchange', routeCurrentHash);
+
+        // Listen for postMessage navigation commands from CameraOS / parent frame
+        window.addEventListener('message', function(evt) {
+          if (evt.data && evt.data.type === 'NAVIGATE' && evt.data.targetId) {
+            if (evt.data.targetId === 'committeeSection' || evt.data.targetId === 'committee' || evt.data.targetId === 'committeeRoot') {
+              if (typeof window.unlockCommittee === 'function') {
+                window.unlockCommittee();
+                return;
+              }
+            }
+            window.location.hash = evt.data.targetId;
+            routeCurrentHash();
+          }
+        });
+      })();
+    </script>
+</body>
+</html>

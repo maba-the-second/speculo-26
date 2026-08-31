@@ -1,0 +1,6 @@
+{
+  "name": "Speculo '26",
+  "description": "Speculo '26 - Photographic Society of Dharmaraja College interactive experience featuring video scrubbing, CameraOS viewfinder, and all-island photography exhibition.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

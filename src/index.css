@@ -1,0 +1,426 @@
+@import "tailwindcss";
+
+/*
+ * NOTE: Tailwind duplication
+ * ──────────────────────────
+ * The React app uses the @tailwindcss/vite plugin (this file).
+ * The static HTML pages in /public/ (main.html, Submissions.html, themes.html)
+ * load Tailwind separately via the CDN script tag (cdn.tailwindcss.com).
+ *
+ * This means Tailwind utilities are loaded twice when iframes are on-screen.
+ * Full resolution requires migrating the static pages to React components.
+ */
+
+/* ============================================================================
+   CURSOR SUPPRESSION
+   ============================================================================ */
+
+.cursor-follower,
+.mouse-circle,
+.cursor-circle,
+.cursor-light {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ============================================================================
+   LOGO HOVER ANIMATION
+   ============================================================================ */
+
+.logo-hover-animate {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+  cursor: pointer;
+  will-change: transform, filter;
+}
+
+.logo-hover-animate:hover {
+  transform: scale(1.12) translateY(-3px) rotate(-2deg);
+  filter: drop-shadow(0 0 20px rgba(100, 223, 223, 0.95)) drop-shadow(0 0 35px rgba(100, 223, 223, 0.5)) brightness(1.25);
+  animation: logoGlowPulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlowPulse {
+  0% {
+    filter: drop-shadow(0 0 16px rgba(100, 223, 223, 0.8)) brightness(1.2);
+    transform: scale(1.1) translateY(-2px) rotate(-1.5deg);
+  }
+  100% {
+    filter: drop-shadow(0 0 30px rgba(100, 223, 223, 1)) drop-shadow(0 0 45px rgba(100, 223, 223, 0.6)) brightness(1.4);
+    transform: scale(1.15) translateY(-5px) rotate(2deg);
+  }
+}
+
+/* ============================================================================
+   SOCIAL ICONS
+   ============================================================================ */
+
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #071018;
+  border: 1px solid rgba(100, 223, 223, 0.25);
+  color: #cbd5e1;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.social-icon:hover {
+  color: #020508;
+  background: #64dfdf;
+  border-color: #64dfdf;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 0 25px rgba(100, 223, 223, 0.7);
+}
+
+.social-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* ============================================================================
+   HIGH-FIDELITY VIDEO RENDERING
+   ============================================================================ */
+
+.speculo-video {
+  image-rendering: -webkit-optimize-contrast;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  contain: layout paint;
+  object-position: center center;
+}
+
+.speculo-video-stage {
+  isolation: isolate;
+  contain: layout paint;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+video {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.speculo-video-stage,
+.speculo-video-stage video {
+  transition: none !important;
+}
+
+/* ============================================================================
+   TARGET CURSOR
+   ============================================================================ */
+
+.orbitron-font {
+  font-family: 'Orbitron', sans-serif;
+}
+
+.target-cursor-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 999999;
+  transform: translate(-50%, -50%);
+}
+
+.target-cursor-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  background: #64DFDF;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  box-shadow: 0 0 8px rgba(100,223,223,0.8);
+  pointer-events: none;
+}
+
+.target-cursor-corner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #64DFDF;
+  will-change: transform;
+  filter: drop-shadow(0 0 4px rgba(100,223,223,0.5));
+  pointer-events: none;
+}
+
+.corner-tl {
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-tr {
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner-br {
+  border-left: none;
+  border-top: none;
+}
+
+.corner-bl {
+  border-right: none;
+  border-top: none;
+}
+
+/* ============================================================================
+   CAMERA MENU (CameraOS)
+   ============================================================================ */
+
+.speculo-logo-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 0 0 auto;
+  background: transparent;
+  overflow: visible;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.speculo-logo-stack img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 50%;
+  background: transparent;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  backface-visibility: hidden;
+}
+
+.speculo-logo-main { z-index: 1; }
+
+.speculo-logo-lens {
+  z-index: 2;
+  transform-origin: 50% 50%;
+}
+
+.speculo-logo-stack--animated .speculo-logo-lens {
+  animation: speculoLensRotation 10s linear infinite;
+  will-change: transform;
+}
+
+.speculo-logo-stack--compact {
+  width: 100%;
+  height: 100%;
+}
+
+.camera-font {
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.camera-chassis {
+  width: min(1150px, 95vw, calc((100vh - 108px) * 1.7777778));
+  height: min(647px, calc(100vh - 108px));
+  min-height: 0;
+  max-height: calc(100vh - 108px);
+  box-sizing: border-box;
+  margin: auto;
+}
+
+.camera-chassis-grid {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 220px;
+  gap: 18px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-center-column {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-right-column {
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-right-logo {
+  width: 204px;
+  height: 126px;
+  flex: 0 0 126px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.camera-right-logo-image {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.camera-pentaprism {
+  width: 320px;
+  height: 72px;
+  top: -72px;
+  border-radius: 30px 30px 0 0;
+  overflow: hidden;
+  border-bottom: 0;
+  box-sizing: border-box;
+  padding: 8px 16px 4px 16px;
+}
+
+.camera-pentaprism .speculo-logo-stack {
+  width: 100%;
+  height: 100%;
+  max-width: 250px;
+  max-height: 58px;
+  margin: auto;
+  transform: translateY(0);
+}
+
+.camera-left-controls {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+}
+
+.camera-dial {
+  width: 132px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  height: 132px;
+  flex: 0 0 132px;
+}
+
+@media (max-width: 900px) {
+  .camera-chassis {
+    width: min(94vw, calc((100vh - 92px) * 1.55));
+    height: min(610px, calc(100vh - 92px));
+    max-height: calc(100vh - 92px);
+  }
+  .camera-chassis-grid {
+    grid-template-columns: 52px minmax(0, 1fr) 188px;
+    gap: 12px;
+  }
+  .camera-right-logo { width: 174px; height: 108px; flex-basis: 108px; }
+  .camera-pentaprism { width: 300px; height: 72px; top: -72px; }
+  .camera-pentaprism .speculo-logo-stack { width: 260px; height: 72px; }
+  .camera-dial { width: 118px; height: 118px; flex-basis: 118px; }
+}
+
+.glass-camera {
+  background: linear-gradient(135deg, rgba(100, 223, 223, 0.06) 0%, rgba(0,0,0,0) 100%), rgba(10, 20, 25, 0.85);
+  border: 1px solid rgba(100, 223, 223, 0.25);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(100, 223, 223, 0.25);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.lcd-screen {
+  box-shadow: inset 0 0 40px rgba(0,0,0,1), 0 0 0 1px rgba(100,223,223,0.15), 0 20px 40px rgba(0,0,0,0.6);
+  background-color: #000;
+  transition: all 0.3s ease;
+}
+
+@keyframes borderGlow {
+  0% { box-shadow: 0 0 5px #64dfdf, inset 0 0 10px #64dfdf; }
+  50% { box-shadow: 0 0 20px #64dfdf, inset 0 0 30px #64dfdf; }
+  100% { box-shadow: 0 0 5px #64dfdf, inset 0 0 10px #64dfdf; }
+}
+
+.glowing-outline {
+  animation: borderGlow 2s infinite alternate;
+}
+
+.crt-scanlines {
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(100, 223, 223, 0.03), rgba(0, 255, 255, 0.02), rgba(100, 223, 223, 0.03));
+  background-size: 100% 4px, 6px 100%;
+}
+
+.rule-of-thirds {
+  background:
+    linear-gradient(to right, transparent 33.33%, rgba(100,223,223,0.12) 33.33%, rgba(100,223,223,0.12) 33.5%, transparent 33.5%),
+    linear-gradient(to right, transparent 66.66%, rgba(100,223,223,0.12) 66.66%, rgba(100,223,223,0.12) 66.83%, transparent 66.83%),
+    linear-gradient(to bottom, transparent 33.33%, rgba(100,223,223,0.12) 33.33%, rgba(100,223,223,0.12) 33.5%, transparent 33.5%),
+    linear-gradient(to bottom, transparent 66.66%, rgba(100,223,223,0.12) 66.66%, rgba(100,223,223,0.12) 66.83%, transparent 66.83%);
+}
+
+.focus-bracket {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid rgba(100,223,223,0.3);
+}
+
+.focus-bracket.hunting {
+  width: 180px;
+  height: 120px;
+  border-color: rgba(100,223,223,0.9);
+  animation: pulse-bracket 0.1s infinite alternate;
+}
+
+.focus-bracket.locked {
+  width: 120px;
+  height: 80px;
+  border-color: #64dfdf !important;
+  background: rgba(100,223,223,0.06);
+}
+
+@keyframes pulse-bracket {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

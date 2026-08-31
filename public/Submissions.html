@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speculo.Submission</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        @keyframes headerEnter { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: translateY(0); } }
+        .header-enter { animation: headerEnter 900ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes pulseGlow { 0%,100% { opacity: 0.5; transform: scale(0.75); } 50% { opacity: 0.9; transform: scale(0.95); } }
+        .pulse-glow { animation: pulseGlow 3.4s ease-in-out infinite; }
+
+        @keyframes shimmerText { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .shimmer-text { background-size: 200% auto; animation: shimmerText 5s linear infinite; }
+
+        @keyframes panelEnter { from { opacity: 0; transform: translateY(28px) scale(0.985); filter: blur(6px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+        .panel-enter { animation: panelEnter 620ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes borderSheen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        .border-sheen {
+            background: linear-gradient(120deg, transparent 30%, rgba(7,170,237,0.35) 50%, transparent 70%);
+            background-size: 300% 100%;
+            animation: borderSheen 6s linear infinite;
+            mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            padding: 1px;
+            border-radius: 1rem;
+        }
+
+        @keyframes tileEnter { from { opacity: 0; transform: translateY(20px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .tile-enter { animation: tileEnter 560ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes catRowEnter { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+        .cat-row { animation: catRowEnter 480ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes inputEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-enter { animation: inputEnter 420ms ease-out both; }
+
+        @keyframes revealUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        .reveal-up { animation: revealUp 480ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes successPop { 0% { opacity: 0; transform: scale(0.4) rotate(-15deg); } 60% { opacity: 1; transform: scale(1.12) rotate(4deg); } 100% { transform: scale(1) rotate(0deg); } }
+        .success-pop { animation: successPop 700ms cubic-bezier(0.34,1.56,0.64,1) both; }
+
+        @keyframes thumbPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+        .thumb-pop { animation: thumbPop 320ms cubic-bezier(0.34,1.56,0.64,1) both; }
+
+        @keyframes framePop { from { opacity: 0; transform: scale(0.94) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .frame-pop { animation: framePop 500ms cubic-bezier(0.16,1,0.3,1) both; }
+
+        @keyframes emptyBreathe { 0%,100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
+        .empty-breathe { animation: emptyBreathe 3.2s ease-in-out infinite; }
+
+        @keyframes scanSweep { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        .scan-sweep {
+            position: absolute; inset: -50% 0; height: 200%;
+            background: linear-gradient(180deg, transparent, rgba(7,170,237,0.15), transparent);
+            animation: scanSweep 2.2s linear infinite;
+        }
+
+        .scanlines {
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 3px);
+        }
+
+        /* scene transition */
+        .scene-transition { transition: opacity 300ms ease, transform 380ms cubic-bezier(0.16,1,0.3,1), filter 300ms ease; }
+        .scene-transition.exit { opacity: 0; transform: translateY(-14px) scale(0.985); filter: blur(4px); pointer-events: none; }
+        .scene-transition.enter { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(4px); pointer-events: none; }
+        .scene-transition.idle { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); pointer-events: auto; }
+
+        .step-view {
+            transition: background-color 0.6s ease !important;
+        }
+        .step-view:hover {
+            background-color: rgba(0, 0, 0, 0.65) !important;
+        }
+
+        .tile-enter, .cat-row, .cat-card, #rules-container, .step-view form input {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+        }
+        
+        .tile-enter:hover, .cat-row:hover, .cat-card:hover, #rules-container:hover,
+        .step-view form input:hover, .step-view form input:focus {
+            background-color: rgba(0, 0, 0, 0.85) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-color: rgba(7, 170, 237, 0.5) !important;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6) !important;
+        }
+
+        .tile-enter:hover *, .cat-row:hover *, .cat-card:hover *, #rules-container:hover * {
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(7, 170, 237, 0.4); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(7, 170, 237, 0.8); }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+
+        /* Hide elements by default for routing */
+        .step-view { display: none; }
+        .step-view.active { display: block; }
+
+        /* ---- Naming/Extraction section (scoped, no collisions) ---- */
+        @keyframes namingPulse { 0%,100% { opacity:.4 } 50% { opacity:1; color:#07aaed; text-shadow:0 0 10px rgba(7,170,237,.8) } }
+        .naming-pulse { animation: namingPulse 2s infinite ease-in-out; display:inline-block; }
+        .naming-fmt-part { transition:.3s; }
+        .naming-fmt-part:hover { color:#fff; text-shadow:0 0 12px rgba(255,255,255,.6); }
+        .naming-chip { transition:.3s cubic-bezier(.16,1,.3,1); cursor:pointer; }
+        .naming-chip:hover { transform:translateY(-3px); background:rgba(255,255,255,.1); }
+        .naming-chip.selected { background:rgba(7,170,237,.15); border-color:rgba(7,170,237,.4); box-shadow:0 0 0 1px rgba(7,170,237,.3); }
+        .naming-toggle-btn { background:rgba(0,0,0,.5); border:1px solid rgba(255,255,255,.1); color:#9ca3af; cursor:pointer; transition:.3s; }
+        .naming-toggle-btn.active { background:rgba(7,170,237,.15); color:#fff; border-color:rgba(7,170,237,.4); }
+        .naming-view { display:none; }
+        .naming-view.active { display:flex; animation:namingFade .4s ease forwards; }
+        @keyframes namingFade { from{opacity:0;transform:scale(.98)} to{opacity:1;transform:scale(1)} }
+        .naming-desktop-mockup { width:100%; max-width:480px; aspect-ratio:16/10; background:#000; border-radius:1rem; box-shadow:0 20px 50px rgba(0,0,0,.6); overflow:hidden; display:flex; flex-direction:column; }
+        .naming-window-bar { height:26px; background:#1a1a1a; display:flex; align-items:center; gap:6px; padding:0 12px; }
+        .naming-dot { width:10px; height:10px; border-radius:50%; }
+        .naming-screen { background:#0d0d0d; flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .naming-photo-container { width:55%; aspect-ratio:4/3; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,.8); transition:all .7s cubic-bezier(.25,1,.5,1); }
+        .naming-photo-image { width:100%; height:100%; object-fit:cover; }
+        .naming-photo-container.minimized { transform:scale(.1) translateY(300px); opacity:0; }
+        .naming-photo-container.focused { transform:scale(1.08); }
+        .naming-blur-overlay { position:absolute; inset:0; background:radial-gradient(circle,transparent 10%,rgba(0,0,0,.8) 100%); backdrop-filter:blur(10px); opacity:0; transition:opacity .6s; pointer-events:none; }
+        .naming-blur-overlay.active { opacity:1; }
+        .naming-rename-dialog { position:absolute; top:50%; left:50%; transform:translate(-50%,-40%) scale(.9); width:88%; max-width:320px; background:rgba(20,20,20,.85); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,.15); border-radius:.9rem; padding:16px; opacity:0; pointer-events:none; transition:.5s cubic-bezier(.34,1.56,.64,1); will-change:transform,opacity; }
+        .naming-rename-dialog.active { transform:translate(-50%,-50%) scale(1); opacity:1; }
+        .naming-os-input { background:rgba(0,0,0,.6); border:2px solid #07aaed; border-radius:.5rem; padding:10px 12px; font-family:monospace; font-size:.85rem; color:#fff; box-shadow:0 0 0 3px rgba(7,170,237,.15); white-space:nowrap; overflow:hidden; }
+        .naming-os-input-sm { padding:7px 9px; font-size:.68rem; border-width:1.5px; }
+        .naming-cursor { display:inline-block; width:2px; height:1.1em; background:#07aaed; margin-left:2px; animation:namingBlink 1s step-end infinite; }
+        @keyframes namingBlink { 50% { opacity:0 } }
+        .naming-save-btn { font-weight:600; font-size:.8rem; padding:5px 14px; border-radius:.4rem; color:#6b7280; background:rgba(255,255,255,.05); transition:.3s; }
+        .naming-save-btn.ready { color:#000; background:#07aaed; box-shadow:0 0 14px rgba(7,170,237,.5); }
+        .naming-save-sm { font-size:.65rem; padding:3px 10px; }
+        
+        /* Demo Phone Mockup - strict GPU paint containment prevents canvas flopping */
+        .naming-desktop-mockup { width:100%; max-width:480px; aspect-ratio:16/10; background:#000; border-radius:1rem; box-shadow:0 20px 50px rgba(0,0,0,.6); overflow:hidden; display:flex; flex-direction:column; contain:paint; transform:translateZ(0); isolation:isolate; }
+        .naming-screen { background:#0d0d0d; flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; contain:paint; }
+        .naming-photo-container { width:55%; aspect-ratio:4/3; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,.8); transition:all .6s cubic-bezier(.25,1,.5,1); will-change:transform,opacity; }
+        .naming-photo-container.minimized { transform:scale(.35) translateY(70px); opacity:0; }
+        .naming-photo-container.focused { transform:scale(1.04); }
+
+        .naming-mobile-mockup { width:100%; max-width:220px; aspect-ratio:9/19.5; background:#000; border-radius:2.2rem; box-shadow:0 20px 50px rgba(0,0,0,.7); position:relative; overflow:hidden; contain:paint; transform:translateZ(0); isolation:isolate; }
+        .naming-island { position:absolute; top:8px; left:50%; transform:translateX(-50%); width:70px; height:18px; background:#000; border-radius:12px; z-index:5; }
+        .naming-mobile-screen { border-radius:1.9rem; margin:4px; height:calc(100% - 8px); overflow:hidden; contain:paint; }
+        .naming-mobile-photo-container { width:80%; aspect-ratio:3/4; border-radius:10px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.8); transition:all .6s cubic-bezier(.25,1,.5,1); will-change:transform,opacity; }
+        .naming-mobile-photo-container.minimized { transform:scale(.35) translateY(60px); opacity:0; }
+        .naming-mobile-photo-container.focused { transform:scale(1.04); }
+        .naming-mobile-dialog { width:86%; max-width:190px; padding:10px; border-radius:.85rem; }
+
+        /* ---- Category animation boxes ---- */
+        .naming-cat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:640px; margin:0 auto; width:100%; }
+        .naming-cat-card {
+            position:relative; overflow:visible; border-radius:14px; cursor:pointer;
+            background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+            padding:14px 8px; min-height:92px; width:100%; box-sizing:border-box;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+            transition:border-color .35s ease, background-color .35s ease, box-shadow .35s ease, border-radius .4s ease;
+        }
+        .naming-cat-card.selected { border-color:#07aaed; background:rgba(7,170,237,.08); box-shadow:0 0 0 1px rgba(7,170,237,.35); }
+        .naming-cat-code { font-weight:800; font-size:1.35rem; position:relative; z-index:2; transition:transform .4s cubic-bezier(.34,1.56,.64,1); line-height:1; }
+        .naming-cat-label { 
+            font-size:clamp(0.6rem, 2.2vw, 0.72rem); 
+            color:#9ca3af; 
+            margin-top:5px; 
+            letter-spacing:0.02em; 
+            text-transform:uppercase; 
+            position:relative; 
+            z-index:2;
+            white-space:normal;
+            word-break:normal;
+            line-height:1.2;
+            text-align:center;
+            display:block;
+            width:100%;
+            overflow:visible;
+        }
+
+/* Colour: yellow hover interaction */
+.naming-cat-colour {
+    transition:
+        background-color .4s ease,
+        border-color .4s ease,
+        box-shadow .4s ease,
+        transform .4s cubic-bezier(.16,1,.3,1);
+}
+
+/* Remove the moving sun */
+.naming-cat-colour .naming-sun {
+    display: none;
+}
+
+/* Yellow hover state */
+.naming-cat-colour:hover {
+    background-color: rgba(250, 204, 21, 0.14);
+    border-color: rgba(250, 204, 21, 0.9);
+    box-shadow:
+        0 0 0 1px rgba(250, 204, 21, 0.5),
+        0 0 30px rgba(250, 204, 21, 0.25);
+}
+
+/* Make the C yellow */
+.naming-cat-colour:hover .naming-cat-code {
+    color: #facc15 !important;
+    text-shadow: 0 0 14px rgba(250, 204, 21, 0.7);
+}
+
+/* Make Colour label yellow/warmer on hover */
+.naming-cat-colour:hover .naming-cat-label {
+    color: #fde68a;
+}
+
+        /* Monochrome: invert colours on hover */
+        .naming-cat-mono { transition: filter .45s ease, border-color .35s ease, background-color .35s ease; }
+        .naming-cat-mono:hover { filter: invert(1) grayscale(1); }
+
+        /* Macro: text zooms in on hover, like a macro lens */
+        .naming-cat-macro:hover .naming-cat-code,
+        .naming-cat-macro:hover .naming-cat-label { transform: scale(1.3); }
+
+        /* Wildlife: two eyes appear on hover */
+        .naming-cat-wildlife .naming-eyes {
+            position:absolute; top:12px; left:50%; transform:translateX(-50%) translateY(-6px);
+            display:flex; gap:7px; opacity:0; transition:opacity .3s ease, transform .3s ease; z-index:2;
+        }
+        .naming-cat-wildlife:hover .naming-eyes { opacity:1; transform:translateX(-50%) translateY(0); }
+        .naming-eye { width:11px; height:11px; border-radius:50%; background:#fff; position:relative; box-shadow:0 0 6px rgba(255,255,255,.6); }
+        .naming-eye::after { content:''; position:absolute; width:5px; height:5px; border-radius:50%; background:#111; top:3px; left:3px; }
+
+        /* Street: dust sweeps over the button on hover */
+        .naming-cat-street .naming-dust {
+            position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0;
+            background:linear-gradient(100deg, transparent 15%, rgba(168,85,247,.45) 50%, transparent 85%);
+            transform:translateX(-130%);
+        }
+        .naming-cat-street:hover .naming-dust { animation: namingDustSweep .9s ease-out forwards; }
+        @keyframes namingDustSweep {
+            0% { opacity:0; transform:translateX(-130%); }
+            15% { opacity:1; }
+            85% { opacity:1; }
+            100% { opacity:0; transform:translateX(130%); }
+        }
+
+        /* Architecture: rounded box -> square on hover, letters cycle */
+        .naming-cat-arch:hover { border-radius:0; }
+        .naming-cat-arch .naming-cat-code { display:inline-block; min-width:1.1ch; }
+
+        /* Mobile: category boxes 2-column or smooth carousel without letter clipping */
+        @media (max-width: 640px) {
+            .naming-cat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 4px;
+            }
+            .naming-cat-card {
+                min-height: 84px;
+                padding: 12px 6px;
+            }
+            .naming-cat-grid-mobile {
+                display: flex;
+                grid-template-columns: none;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                gap: 12px;
+                padding: 10px 20vw;
+                margin: 0 -1rem;
+                scrollbar-width: none;
+            }
+            .naming-cat-grid-mobile::-webkit-scrollbar { display: none; }
+            .naming-cat-grid-mobile .naming-cat-card {
+                flex: 0 0 135px;
+                min-width: 130px;
+                max-width: 155px;
+                scroll-snap-align: center;
+                opacity: 0.45;
+                transform: scale(0.92);
+                transition: opacity .35s ease, transform .35s ease, border-color .35s ease;
+            }
+            .naming-cat-grid-mobile .naming-cat-card.in-view {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animated Logo on Hover */
+        .logo-hover-animate {
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+            cursor: pointer;
+            will-change: transform, filter;
+        }
+
+        .logo-hover-animate:hover {
+            transform: scale(1.12) translateY(-3px) rotate(-2deg);
+            filter: drop-shadow(0 0 20px rgba(7, 170, 237, 0.95)) drop-shadow(0 0 35px rgba(7, 170, 237, 0.5)) brightness(1.25);
+            animation: logoGlowPulseSub 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlowPulseSub {
+            0% {
+                filter: drop-shadow(0 0 16px rgba(7, 170, 237, 0.8)) brightness(1.2);
+                transform: scale(1.1) translateY(-2px) rotate(-1.5deg);
+            }
+            100% {
+                filter: drop-shadow(0 0 30px rgba(7, 170, 237, 1)) drop-shadow(0 0 45px rgba(7, 170, 237, 0.6)) brightness(1.4);
+                transform: scale(1.15) translateY(-5px) rotate(2deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-200 min-h-screen selection:bg-[#07aaed]/30 selection:text-white relative overflow-x-hidden">
+
+    <!-- WebGL Cinematic Background -->
+    <canvas id="webgl-canvas" class="fixed inset-0 w-full h-full -z-20 pointer-events-none object-cover"></canvas>
+    
+    <!-- Ambient Particles -->
+    <canvas id="particle-canvas" class="fixed inset-0 w-full h-full -z-10 pointer-events-none"></canvas>
+    
+    <!-- Cursor Spotlight Glow -->
+    <div id="cursor-glow" class="fixed top-0 left-0 w-[600px] h-[600px] rounded-full pointer-events-none -z-10 opacity-40 mix-blend-screen hidden md:block" style="background: radial-gradient(circle, rgba(7,170,237,0.18) 0%, rgba(7,170,237,0) 70%); transform: translate3d(-300px, -300px, 0);"></div>
+
+    <!-- Boot letterbox reveal -->
+    <div id="boot-curtains" class="fixed inset-0 z-[60] pointer-events-none transition-opacity duration-700 opacity-100">
+        <div id="boot-top" class="absolute top-0 left-0 w-full bg-black h-1/2 transition-all duration-[900ms] ease-[cubic-bezier(0.76,0,0.24,1)]"></div>
+        <div id="boot-bottom" class="absolute bottom-0 left-0 w-full bg-black h-1/2 transition-all duration-[900ms] ease-[cubic-bezier(0.76,0,0.24,1)]"></div>
+    </div>
+
+    <!-- Vignette + scanline overlay -->
+    <div class="fixed inset-0 pointer-events-none -z-10" style="box-shadow: inset 0 0 220px rgba(0,0,0,0.85);"></div>
+    <div class="fixed inset-0 pointer-events-none -z-10 opacity-[0.04] scanlines"></div>
+
+    <!-- Custom Toast -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md border border-[#07aaed]/50 text-white px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_25px_rgba(7,170,237,0.4)] transition-all duration-500 z-50 translate-y-20 opacity-0 pointer-events-none">
+        <i class="ph ph-check text-[#07aaed] text-xl"></i>
+        <span id="toast-message" class="font-medium"></span>
+    </div>
+
+    <main class="container mx-auto px-4 py-12 max-w-4xl relative z-10 flex flex-col items-center">
+        
+        <!-- Header Logo -->
+        <header class="flex flex-col items-center mb-10 header-enter">
+            <div class="relative mb-4">
+                <div class="absolute inset-0 blur-2xl bg-[#07aaed]/30 rounded-full scale-75 pulse-glow"></div>
+                <img 
+                    src="https://raw.githubusercontent.com/dulajbandara28-sketch/livematch/main/Speculo%20_26%20black.svg" 
+                    alt="Speculo" 
+                    class="relative h-28 md:h-36 object-contain filter invert brightness-200 drop-shadow-[0_0_25px_rgba(7,170,237,0.4)] logo-hover-animate"
+                />
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-white via-[#07aaed] to-white text-center mt-2 shimmer-text">
+                SUBMISSIONS
+            </h1>
+            <p class="text-[#07aaed]/80 tracking-[0.4em] uppercase text-xs md:text-sm mt-3 font-semibold">All-island Photography Competition</p>
+            <div class="mt-5 h-[1px] w-24 bg-gradient-to-r from-transparent via-[#07aaed] to-transparent"></div>
+        </header>
+
+        <!-- Progress Rail (Hidden on mobile) -->
+        <div class="hidden md:block w-full max-w-xl mx-auto mb-10 px-2 select-none">
+            <div class="flex items-center justify-between relative" id="progress-rail">
+                <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-white/10 rounded-full"></div>
+                <div id="progress-bar" class="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-gradient-to-r from-[#07aaed]/40 via-[#07aaed] to-[#07aaed] rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(7,170,237,0.8)]" style="width: 0%;"></div>
+                <!-- Nodes generated by JS -->
+            </div>
+        </div>
+
+        <!-- Scene Transition Wrapper -->
+        <div id="scene-wrapper" class="scene-transition idle w-full relative">
+            
+            <div id="step-HOME" class="step-view active relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8 md:p-12 text-center">
+                <!-- Glass panel styles reused -->
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-10 tracking-[0.2em] uppercase text-white/90">Select Submission Type</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button onclick="goToStep('ONLINE_GUIDES')" class="tile-enter group relative flex flex-col items-center justify-center p-10 bg-black/40 border border-white/10 hover:border-[#07aaed]/60 rounded-xl transition-all duration-500 hover:-translate-y-2 hover:bg-[#07aaed]/10 hover:shadow-[0_0_40px_rgba(7,170,237,0.25)] overflow-hidden" style="animation-delay: 0ms">
+                            <div class="absolute inset-0 bg-gradient-to-b from-[#07aaed]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"><div class="absolute inset-0 scan-sweep"></div></div>
+                            <i class="ph ph-monitor-play text-[#07aaed] text-5xl mb-5 group-hover:scale-110 transition-transform duration-500 relative z-10"></i>
+                            <span class="text-2xl font-bold tracking-widest text-white relative z-10">ONLINE</span>
+                            <span class="text-sm text-gray-400 mt-3 font-medium relative z-10">Digital Entries</span>
+                        </button>
+                        <button onclick="goToStep('PHYSICAL_FORM')" class="tile-enter group relative flex flex-col items-center justify-center p-10 bg-black/40 border border-white/10 hover:border-[#07aaed]/60 rounded-xl transition-all duration-500 hover:-translate-y-2 hover:bg-[#07aaed]/10 hover:shadow-[0_0_40px_rgba(7,170,237,0.25)] overflow-hidden" style="animation-delay: 120ms">
+                            <div class="absolute inset-0 bg-gradient-to-b from-[#07aaed]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"><div class="absolute inset-0 scan-sweep"></div></div>
+                            <i class="ph ph-users text-[#07aaed] text-5xl mb-5 group-hover:scale-110 transition-transform duration-500 relative z-10"></i>
+                            <span class="text-2xl font-bold tracking-widest text-white relative z-10">PHYSICAL</span>
+                            <span class="text-sm text-gray-400 mt-3 font-medium relative z-10">In-person Competition</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-PHYSICAL_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <button onclick="goToStep('HOME')" class="text-gray-400 hover:text-white mb-8 flex items-center text-sm font-medium transition-colors group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+                    <h2 class="text-2xl font-bold mb-8 text-[#07aaed] uppercase tracking-wider border-b border-[#07aaed]/20 pb-4">Physical Submission Form</h2>
+                    
+                    <form onsubmit="handlePhysicalSubmit(event)" class="space-y-6">
+                        <div class="flex flex-col mb-4 input-enter">
+                            <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Name of the participant <span class="text-[#07aaed]">*</span></label>
+                            <input type="text" name="name" required placeholder="Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                        </div>
+                        <div class="flex flex-col mb-4 input-enter">
+                            <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Email <span class="text-[#07aaed]">*</span></label>
+                            <input type="email" name="email" required placeholder="your@email.com" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter">
+                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Date of Birth <span class="text-[#07aaed]">*</span></label>
+                                <input type="date" name="dob" required style="color-scheme: dark" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                            </div>
+                            <div class="flex flex-col mb-4 input-enter">
+                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">School</label>
+                                <input type="text" name="school" placeholder="School Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                            </div>
+                        </div>
+                        <div class="flex flex-col mb-4 input-enter">
+                            <label id="physical-president-label" class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Photography Club President's Name</label>
+                            <input type="text" name="president" placeholder="President's Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter">
+                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label>
+                                <div class="relative flex group">
+                                    <span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400 transition-colors group-focus-within:border-[#07aaed]/60 group-focus-within:text-[#07aaed]">+94</span>
+                                    <input type="text" name="phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                                </div>
+                            </div>
+                            <div class="flex flex-col mb-4 input-enter">
+                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Grade</label>
+                                <input type="text" name="grade" id="physical-grade-input" placeholder="e.g. Grade 12" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                            </div>
+                        </div>
+                        <div class="pt-6">
+                            <button type="submit" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">
+                                <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span>
+                                <span class="relative z-10 flex items-center justify-center gap-2">Submit Details</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="step-PHYSICAL_SUCCESS" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-12 text-center border-t-4 border-t-[#07aaed]">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-24 h-24 rounded-full bg-[#07aaed]/10 border border-[#07aaed]/30 flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(7,170,237,0.3)] success-pop">
+                        <i class="ph ph-check text-5xl text-[#07aaed]"></i>
+                    </div>
+                    <h2 class="text-3xl font-black mb-4 uppercase tracking-widest text-white">Submission Initiated</h2>
+                    <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                        Thank you for joining the physical exhibition.<br/>
+                        <span class="text-[#07aaed] font-semibold text-xl block mt-4"</span>
+                    </p>
+                    <button onclick="goToStep('HOME')" class="px-12 py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-black/40 border border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/5 hover:-translate-y-0.5 active:translate-y-0">
+                        <span class="relative z-10 flex items-center justify-center gap-2">Return Home</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="step-ONLINE_GUIDES" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <button onclick="goToStep('HOME')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+                    <h2 class="text-2xl font-bold mb-6 text-[#07aaed] uppercase tracking-wider">Competition Guidelines</h2>
+                    
+                    <div id="rules-container" class="bg-black/40 rounded-xl p-6 h-[400px] overflow-y-auto mb-8 border border-white/5 space-y-8 custom-scrollbar">
+                        <section class="reveal-up" style="animation-delay: 60ms">
+                            <h3 class="text-white font-bold mb-3 flex items-center gap-2"><i class="ph ph-book-open text-xl text-[#07aaed]"></i> Submission Rules</h3>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-400 text-sm">
+                                <li>Each participant can submit up to 3 photographs per category.</li>
+                                <li>You may enter multiple categories.</li>
+                                <li>All photographs must be original work.</li>
+                                <li>Submit high-resolution images (minimum 3000px on longest side).</li>
+                                <li>File format: JPEG or PNG.</li>
+                            </ul>
+                        </section>
+                        <section class="reveal-up" style="animation-delay: 150ms">
+                            <h3 class="text-white font-bold mb-3 flex items-center gap-2"><i class="ph ph-image text-xl text-[#07aaed]"></i> Image Requirements</h3>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-400 text-sm">
+                                <li>Basic editing is allowed (crop, exposure, color correction).</li>
+                                <li>No composite images or heavy manipulation.</li>
+                                <li>For monochrome category: Shades of black and white only.</li>
+                                <li>For mobile category: captured with smartphone or tablet.</li>
+                            </ul>
+                        </section>
+                        <section class="reveal-up" style="animation-delay: 240ms">
+                            <h3 class="text-white font-bold mb-3 flex items-center gap-2"><i class="ph ph-camera text-xl text-[#07aaed]"></i> Judging Criteria</h3>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-400 text-sm">
+                                <li>Technical excellence and composition.</li>
+                                <li>Creativity and originality.</li>
+                                <li>Impact and emotional resonance.</li>
+                                <li>Adherence to category theme.</li>
+                                <li>Overall artistic merit.</li>
+                            </ul>
+                        </section>
+                    </div>
+
+                    <div class="flex items-center mb-8 p-4 bg-white/5 rounded-lg border border-white/10 cursor-pointer hover:border-[#07aaed]/30 transition-colors" onclick="toggleRules(this)">
+                        <div id="rules-checkbox" class="w-6 h-6 rounded flex items-center justify-center mr-4 border transition-all duration-300 border-gray-500">
+                            <i id="rules-check-icon" class="ph ph-check text-black hidden"></i>
+                        </div>
+                        <span class="text-gray-200 select-none font-medium tracking-wide">I accept the guidelines and rules</span>
+                    </div>
+
+                    <button id="btn-accept-rules" disabled onclick="goToStep('ONLINE_NAMING')" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gray-800/50 text-gray-500 cursor-not-allowed border border-white/5">
+                        <span class="relative z-10 flex items-center justify-center gap-2">Accept and Continue</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION: NAMING FORMAT & EXTRACTION GUIDELINES -->
+            <!-- SECTION: NAMING FORMAT & EXTRACTION GUIDELINES -->
+            <div id="step-ONLINE_NAMING" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-6 sm:p-8">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+
+                <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_GUIDES')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+
+                    <div class="text-center max-w-2xl mx-auto mb-6">
+                        <span class="text-[#07aaed] text-xs font-mono tracking-[0.25em] uppercase font-bold">Standardized Convention</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mt-1">Image Naming &amp; Extraction</h2>
+                        <p class="text-gray-400 text-xs sm:text-sm mt-2 leading-relaxed">
+                            To ensure unbiased blind judging and automated cataloging, rename all image files strictly according to the format below prior to upload.
+                        </p>
+                    </div>
+
+                    <!-- Live format pill -->
+                    <div class="flex justify-center px-2 mb-6">
+                        <div class="naming-format-pill flex flex-wrap items-center justify-center gap-1 sm:gap-3 px-5 py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm md:text-base font-mono text-gray-300 max-w-[92vw]">
+                            <span class="naming-fmt-part">PHOTOGRAPH NAME</span>
+                            <span class="naming-pulse text-gray-500 font-bold">_</span>
+                            <span class="naming-fmt-part">CATEGORY CODE</span>
+                            <span class="naming-pulse text-gray-500 font-bold" style="animation-delay:0.6s">_</span>
+                            <span class="naming-fmt-part">SUBMITTER NAME</span>
+                            <span class="naming-pulse text-gray-500 font-bold" style="animation-delay:1.2s">.</span>
+                            <span class="naming-fmt-part">FILE TYPE</span>
+                        </div>
+                    </div>
+
+                    <!-- Category boxes -->
+                    <div id="naming-cat-grid" class="naming-cat-grid mb-10" role="group" aria-label="Category codes">
+               <button class="naming-cat-card naming-cat-colour selected" data-code="C">
+    <span class="naming-cat-code text-[#07aaed]">C</span>
+    <span class="naming-cat-label">Colour</span>
+</button>
+                        <button class="naming-cat-card naming-cat-mono" data-code="B">
+                            <span class="naming-cat-code text-gray-300">B</span>
+                            <span class="naming-cat-label">Monochrome</span>
+                        </button>
+                        <button class="naming-cat-card naming-cat-macro" data-code="M">
+                            <span class="naming-cat-code text-green-400">M</span>
+                            <span class="naming-cat-label">Macro</span>
+                        </button>
+                        <button class="naming-cat-card naming-cat-wildlife" data-code="W">
+                            <span class="naming-eyes"><span class="naming-eye"></span><span class="naming-eye"></span></span>
+                            <span class="naming-cat-code text-yellow-400">W</span>
+                            <span class="naming-cat-label">Wildlife</span>
+                        </button>
+                        <button class="naming-cat-card naming-cat-street" data-code="S">
+                            <span class="naming-dust"></span>
+                            <span class="naming-cat-code text-purple-400">S</span>
+                            <span class="naming-cat-label">Street</span>
+                        </button>
+                        <button class="naming-cat-card naming-cat-arch" data-code="A">
+                            <span class="naming-cat-code text-orange-400">A</span>
+                            <span class="naming-cat-label">Architecture</span>
+                        </button>
+                    </div>
+
+                    <!-- Rename mockup: desktop example for desktop users, mobile example for mobile users -->
+                    <div id="naming-desktop-view" class="naming-view-desktop hidden md:flex justify-center">
+                        <div class="naming-desktop-mockup">
+                            <div class="naming-window-bar"><span class="naming-dot" style="background:#ff5f56"></span><span class="naming-dot" style="background:#ffbd2e"></span><span class="naming-dot" style="background:#27c93f"></span></div>
+                            <div class="naming-screen">
+                                <div id="naming-desk-photo" class="naming-photo-container">
+                                    <img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?auto=format&fit=crop&w=1200&q=70" alt="Demo photo used in the rename walkthrough" class="naming-photo-image">
+                                </div>
+                                <div id="naming-desk-blur" class="naming-blur-overlay"></div>
+                                <div id="naming-desk-panel" class="naming-rename-dialog">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium text-gray-100">Rename Submission</span>
+                                        <span id="naming-desk-save" class="naming-save-btn">Save</span>
+                                    </div>
+                                    <div class="naming-os-input"><span id="naming-desk-typing">IMG_8492.JPEG</span><span class="naming-cursor"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="naming-mobile-view" class="naming-view-mobile flex md:hidden justify-center">
+                        <div class="naming-mobile-mockup">
+                            <div class="naming-island"></div>
+                            <div class="naming-screen naming-mobile-screen">
+                                <div id="naming-mob-photo" class="naming-mobile-photo-container">
+                                    <img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?auto=format&fit=crop&w=1200&q=70" alt="Demo photo used in the rename walkthrough" class="naming-photo-image">
+                                </div>
+                                <div id="naming-mob-blur" class="naming-blur-overlay"></div>
+                                <div id="naming-mob-panel" class="naming-rename-dialog naming-mobile-dialog">
+                                    <div class="flex justify-between items-center mb-1.5">
+                                        <span class="text-xs font-medium text-gray-100">Rename</span>
+                                        <span id="naming-mob-save" class="naming-save-btn naming-save-sm">Save</span>
+                                    </div>
+                                    <div class="naming-os-input naming-os-input-sm"><span id="naming-mob-typing">IMG_8492.JPEG</span><span class="naming-cursor"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="goToStep('ONLINE_CAT')" class="w-full mt-10 py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <span>Proceed</span>
+                            <i class="ph ph-caret-right text-xl"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="step-ONLINE_CAT" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8 md:p-12 text-center">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_NAMING')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors absolute top-0 left-0 group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+                    <h2 class="text-2xl font-bold mb-10 text-white tracking-[0.2em] uppercase mt-8 md:mt-0">SECTION ONE: CATEGORY</h2>
+                    <div class="flex flex-col gap-5 max-w-md mx-auto">
+                        <button onclick="goToStep('INTRA_FORM')" class="cat-row group py-6 px-6 bg-black/40 border border-white/10 hover:border-[#07aaed] rounded-xl transition-all duration-300 hover:bg-[#07aaed]/10 flex items-center justify-center gap-4 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(7,170,237,0.4)]" style="animation-delay: 0ms">
+                            <i class="ph ph-student text-2xl text-[#07aaed] group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xl font-bold tracking-widest">INTRA SCHOOL</span>
+                        </button>
+                        <button onclick="goToStep('INTER_FORM')" class="cat-row group py-6 px-6 bg-black/40 border border-white/10 hover:border-[#07aaed] rounded-xl transition-all duration-300 hover:bg-[#07aaed]/10 flex items-center justify-center gap-4 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(7,170,237,0.4)]" style="animation-delay: 90ms">
+                            <i class="ph ph-buildings text-2xl text-[#07aaed] group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xl font-bold tracking-widest">INTER SCHOOL</span>
+                        </button>
+                        <button onclick="goToStep('OPEN_FORM')" class="cat-row group py-6 px-6 bg-black/40 border border-white/10 hover:border-[#07aaed] rounded-xl transition-all duration-300 hover:bg-[#07aaed]/10 flex items-center justify-center gap-4 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(7,170,237,0.4)]" style="animation-delay: 180ms">
+                            <i class="ph ph-mask-happy text-2xl text-[#07aaed] group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xl font-bold tracking-widest">OPEN CATEGORY</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTRA FORM -->
+            <div id="step-INTRA_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_CAT')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+                    <h2 class="text-2xl font-bold mb-8 text-[#07aaed] uppercase tracking-wider border-b border-[#07aaed]/20 pb-4">Intra School Details</h2>
+                    <form onsubmit="handleOnlineDetailsSubmit(event)" class="space-y-6">
+                        <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Name of the participant <span class="text-[#07aaed]">*</span></label><input type="text" name="name" required placeholder="Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Grade</label><input type="text" name="grade" id="intra-grade" placeholder="e.g. Grade 12" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label><div class="relative flex group"><span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400">+94</span><input type="text" name="phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed]"></div></div>
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Date of Birth <span class="text-[#07aaed]">*</span></label><input type="date" name="dob" required style="color-scheme: dark" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        </div>
+                        <div class="pt-4"><button type="submit" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black"><span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span><span class="relative z-10">Proceed to Submission</span></button></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- INTER FORM -->
+            <div id="step-INTER_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
+                 <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                 <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_CAT')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group"><i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back</button>
+                    <h2 class="text-2xl font-bold mb-8 text-[#07aaed] uppercase tracking-wider border-b border-[#07aaed]/20 pb-4">Inter School Details</h2>
+                    <form onsubmit="handleOnlineDetailsSubmit(event)" class="space-y-6">
+                        <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Name of the participant <span class="text-[#07aaed]">*</span></label><input type="text" name="name" required placeholder="Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Grade</label><input type="text" name="grade" id="inter-grade" placeholder="e.g. Grade 12" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">School</label><input type="text" name="school" placeholder="School Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label><div class="relative flex group"><span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400">+94</span><input type="text" name="phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed]"></div></div>
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Date of Birth <span class="text-[#07aaed]">*</span></label><input type="date" name="dob" required style="color-scheme: dark" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        </div>
+                        <div class="pt-4"><button type="submit" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black"><span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span><span class="relative z-10">Proceed to Submission</span></button></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- OPEN FORM -->
+            <div id="step-OPEN_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
+                 <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                 <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_CAT')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group"><i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back</button>
+                    <h2 class="text-2xl font-bold mb-8 text-[#07aaed] uppercase tracking-wider border-b border-[#07aaed]/20 pb-4">Open Category Details</h2>
+                    <form onsubmit="handleOnlineDetailsSubmit(event)" class="space-y-6">
+                        <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Name of the participant <span class="text-[#07aaed]">*</span></label><input type="text" name="name" required placeholder="Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label><div class="relative flex group"><span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400">+94</span><input type="text" name="phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed]"></div></div>
+                            <div class="flex flex-col mb-4 input-enter"><label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Date of Birth <span class="text-[#07aaed]">*</span></label><input type="date" name="dob" required style="color-scheme: dark" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed]"></div>
+                        </div>
+                        <div class="pt-4"><button type="submit" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black"><span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span><span class="relative z-10">Proceed to Submission</span></button></div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="step-ONLINE_UPLOAD" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-6 md:p-10 max-w-5xl w-[95vw] md:w-full mx-auto">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="relative z-10">
+                    <button onclick="goToStep('ONLINE_CAT')" class="text-gray-400 hover:text-white mb-6 flex items-center text-sm transition-colors group">
+                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                    </button>
+                    <h2 class="text-2xl md:text-3xl font-light mb-10 text-center text-white/90 uppercase tracking-widest">
+                        HAI <span id="upload-name-display" class="font-black text-[#07aaed] bg-clip-text text-transparent bg-gradient-to-r from-[#07aaed] to-white">PHOTOGRAPHER</span>,<br/>
+                        <span class="text-lg md:text-xl text-gray-400 mt-3 block font-bold">SUBMIT YOUR PHOTOGRAPHS</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <!-- Upload Controls (Generated by JS) -->
+                        <div id="upload-categories" class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Categories injected here -->
+                        </div>
+
+                        <!-- Cinematic Gallery Preview -->
+                        <div class="bg-black/20 rounded-xl border border-white/5 p-6 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+                            
+                            <!-- Empty State -->
+                            <div id="preview-empty" class="text-center text-gray-500 flex flex-col items-center empty-breathe">
+                                <i class="ph ph-camera text-6xl mb-4 opacity-50"></i>
+                                <p class="tracking-widest uppercase text-sm font-medium">Your photographic vision<br/>will appear here</p>
+                            </div>
+
+                            <!-- Filled State -->
+                            <div id="preview-filled" class="w-full h-full flex flex-col hidden">
+                                <h3 class="text-[#07aaed] uppercase tracking-widest font-bold text-sm mb-6 text-center">Preview</h3>
+                                <div id="preview-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow">
+                                    <!-- Preview images injected here -->
+                                </div>
+                                <div id="preview-more" class="col-span-full text-center text-xs text-gray-500 uppercase tracking-widest mt-6 hidden">
+                                    + X more photographs 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 mt-8 border-t border-white/10">
+                        <button onclick="submitUploads()" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">
+                            <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span>
+                            <span class="relative z-10">Confirm & Submit</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-ONLINE_SUCCESS" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-12 text-center border-t-4 border-t-[#07aaed]">
+                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
+                <div class="relative z-10">
+                    <div class="w-24 h-24 rounded-full bg-[#07aaed]/10 border border-[#07aaed]/30 flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(7,170,237,0.3)] success-pop">
+                        <i class="ph ph-camera text-5xl text-[#07aaed]"></i>
+                    </div>
+                   <h2 class="text-3xl font-black mb-4 uppercase tracking-widest text-white">Submitted</h2>
+                    <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                        Photoes has been received<br/>
+                        <span class="text-[#07aaed] font-semibold">rajans.photography</span>
+                    </p>
+                    <button onclick="resetAndGoHome()" class="px-12 py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-black/40 border border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/5 hover:-translate-y-0.5 active:translate-y-0">
+                        <span class="relative z-10">Submit Another</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // State Management
+        let currentStep = 'HOME';
+        let acceptedRules = false;
+        let formData = { name: '', email: '', grade: '', school: '', president: '', phone: '', dob: '' };
+        const categories = ['Color', 'Monochrome', 'Wildlife', 'Macro', 'Street', 'Architecture', 'Mobile'];
+        let uploads = { Color: [], Monochrome: [], Wildlife: [], Macro: [], Street: [], Architecture: [], Mobile: [] };
+
+        // Progress Rail Labels
+        const progressLabels = ['START', 'RULES', 'NAMING', 'CATEGORY', 'DETAILS', 'UPLOAD', 'DONE'];
+        
+        function getActFromStep(step) {
+            if (step === 'HOME') return 0;
+            if (step === 'ONLINE_GUIDES' || step === 'PHYSICAL_FORM') return 1;
+            if (step === 'ONLINE_NAMING') return 2;
+            if (step === 'ONLINE_CAT') return 3;
+            if (['INTRA_FORM', 'INTER_FORM', 'OPEN_FORM'].includes(step)) return 4;
+            if (step === 'ONLINE_UPLOAD') return 5;
+            if (step === 'ONLINE_SUCCESS' || step === 'PHYSICAL_SUCCESS') return 6;
+            return 0;
+        }
+
+        // Initialize Progress Rail DOM
+        function initProgressRail() {
+            const container = document.getElementById('progress-rail');
+            progressLabels.forEach((label, idx) => {
+                const div = document.createElement('div');
+                div.className = "relative z-10 flex flex-col items-center gap-2 group";
+                div.innerHTML = `
+                    <div id="rail-node-${idx}" class="w-2.5 h-2.5 rounded-full border transition-all duration-500 bg-black border-white/20"></div>
+                    <span id="rail-text-${idx}" class="hidden sm:block text-[9px] tracking-[0.2em] font-bold uppercase transition-colors duration-500 text-gray-600">${label}</span>
+                `;
+                container.appendChild(div);
+            });
+            updateProgressRail();
+        }
+
+        function updateProgressRail() {
+            const act = getActFromStep(currentStep);
+            const bar = document.getElementById('progress-bar');
+            bar.style.width = `${(act / (progressLabels.length - 1)) * 100}%`;
+
+            progressLabels.forEach((_, idx) => {
+                const node = document.getElementById(`rail-node-${idx}`);
+                const text = document.getElementById(`rail-text-${idx}`);
+                if (idx <= act) {
+                    node.className = "w-2.5 h-2.5 rounded-full border transition-all duration-500 bg-[#07aaed] border-[#07aaed] shadow-[0_0_12px_rgba(7,170,237,0.9)] scale-110";
+                    text.className = "hidden sm:block text-[9px] tracking-[0.2em] font-bold uppercase transition-colors duration-500 text-[#07aaed]";
+                } else {
+                    node.className = "w-2.5 h-2.5 rounded-full border transition-all duration-500 bg-black border-white/20";
+                    text.className = "hidden sm:block text-[9px] tracking-[0.2em] font-bold uppercase transition-colors duration-500 text-gray-600";
+                }
+            });
+        }
+
+        // Navigation
+        function goToStep(step) {
+            const wrapper = document.getElementById('scene-wrapper');
+            const currentEl = document.getElementById(`step-${currentStep}`);
+            const nextEl = document.getElementById(`step-${step}`);
+            
+            // Sync form data if needed for display
+            if(step === 'ONLINE_UPLOAD') {
+                document.getElementById('upload-name-display').innerText = formData.name || 'PHOTOGRAPHER';
+                renderUploadsUI();
+            }
+
+            // Exit animation
+            wrapper.classList.remove('idle', 'enter');
+            wrapper.classList.add('exit');
+            
+            setTimeout(() => {
+                currentEl.classList.remove('active');
+                nextEl.classList.add('active');
+                currentStep = step;
+                
+                updateProgressRail();
+                
+                // Enter animation
+                wrapper.classList.remove('exit');
+                wrapper.classList.add('enter');
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        wrapper.classList.remove('enter');
+                        wrapper.classList.add('idle');
+                    });
+                });
+            }, 260); // match React timeout
+        }
+
+        // Toast
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 4000);
+        }
+
+        // Form Handlers
+        function handleInputChange(e) {
+            const name = e.target.name;
+            const value = e.target.value;
+            formData[name] = value;
+
+            // Sync all inputs with same name across forms
+            document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                if(input !== e.target) input.value = value;
+            });
+
+            // DOB Grade Calc
+            if (name === 'dob' && value) {
+                const dobDate = new Date(value);
+                if (!isNaN(dobDate.getTime())) {
+                    const year = dobDate.getFullYear();
+                    const month = dobDate.getMonth();
+                    const cycleYear = month === 0 ? year - 1 : year;
+                    const calculatedGrade = 2020 - cycleYear;
+                    
+                    if (calculatedGrade >= 6 && calculatedGrade <= 13) {
+                        formData.grade = `Grade ${calculatedGrade}`;
+                        document.querySelectorAll(`input[name="grade"]`).forEach(input => input.value = formData.grade);
+                    }
+                }
+            }
+
+            // President Label Update (Physical Form)
+            if (name === 'school') {
+                const label = document.getElementById('physical-president-label');
+                if(label) label.innerText = value ? `${value} Photography Club President's Name` : "Photography Club President's Name";
+            }
+        }
+
+        function handlePhoneChange(e) {
+            let val = e.target.value.replace(/\D/g, '').substring(0, 9);
+            formData.phone = val;
+            document.querySelectorAll(`input[name="phone"]`).forEach(input => input.value = val);
+        }
+
+        async function handlePhysicalSubmit(e) { 
+            e.preventDefault(); 
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            
+            // Disable all inputs in this form
+            const inputs = e.target.querySelectorAll('input, button');
+            inputs.forEach(el => el.disabled = true);
+            submitBtn.innerHTML = '<span class="relative z-10">Submitting...</span>';
+
+            try {
+                const res = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'physical',
+                        name: formData.name,
+                        email: formData.email,
+                        phone: formData.phone,
+                        dob: formData.dob,
+                        grade: e.target.querySelector('[name="grade"]')?.value || null,
+                        school: formData.school,
+                        president: formData.president
+                    })
+                });
+                
+                if(!res.ok) throw new Error('Submission failed');
+                goToStep('PHYSICAL_SUCCESS'); 
+            } catch (err) {
+                alert(err.message);
+                inputs.forEach(el => el.disabled = false);
+                submitBtn.innerHTML = originalHtml;
+            }
+        }
+
+        let currentSubmissionId = null;
+
+        async function handleOnlineDetailsSubmit(e) { 
+            e.preventDefault(); 
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            
+            // Disable all inputs in this form
+            const inputs = e.target.querySelectorAll('input, button');
+            inputs.forEach(el => el.disabled = true);
+            submitBtn.innerHTML = '<span class="relative z-10">Saving...</span>';
+
+            let type = 'online_intra';
+            if (currentStep === 'INTER_FORM') type = 'online_inter';
+            if (currentStep === 'OPEN_FORM') type = 'online_open';
+
+            try {
+                const res = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type,
+                        name: formData.name,
+                        email: formData.email || null,
+                        phone: formData.phone,
+                        dob: formData.dob,
+                        grade: e.target.querySelector('[name="grade"]')?.value || null,
+                        school: type === 'online_open' ? null : formData.school
+                    })
+                });
+                
+                if(!res.ok) {
+                    const errBody = await res.json().catch(() => ({}));
+                    throw new Error(errBody.error || 'Failed to create submission');
+                }
+                
+                const data = await res.json();
+                currentSubmissionId = data.id;
+
+                goToStep('ONLINE_UPLOAD'); 
+                
+                // Update Name display in Upload step
+                document.getElementById('upload-name-display').innerText = formData.name;
+            } catch (err) {
+                alert(err.message);
+                inputs.forEach(el => el.disabled = false);
+                submitBtn.innerHTML = originalHtml;
+            }
+        }
+        
+        function toggleRules(el) {
+            acceptedRules = !acceptedRules;
+            const checkbox = document.getElementById('rules-checkbox');
+            const icon = document.getElementById('rules-check-icon');
+            const btn = document.getElementById('btn-accept-rules');
+            
+            if(acceptedRules) {
+                checkbox.className = "w-6 h-6 rounded flex items-center justify-center mr-4 border transition-all duration-300 bg-[#07aaed] border-[#07aaed] shadow-[0_0_15px_rgba(7,170,237,0.6)] scale-105";
+                icon.classList.remove('hidden');
+                btn.disabled = false;
+                btn.className = "w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]";
+            } else {
+                checkbox.className = "w-6 h-6 rounded flex items-center justify-center mr-4 border transition-all duration-300 border-gray-500";
+                icon.classList.add('hidden');
+                btn.disabled = true;
+                btn.className = "w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gray-800/50 text-gray-500 cursor-not-allowed border border-white/5";
+            }
+        }
+
+        // Upload Logic
+        function initUploadUI() {
+            const container = document.getElementById('upload-categories');
+            container.innerHTML = '';
+            categories.forEach((cat, i) => {
+                const div = document.createElement('div');
+                div.className = `cat-card reveal-up bg-black/30 border border-white/5 rounded-xl p-5 hover:border-[#07aaed]/40 transition-colors duration-300 group`;
+                div.style.animationDelay = `${i * 60}ms`;
+                div.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-1 flex items-center uppercase tracking-wider">
+                                <span class="w-2 h-2 bg-[#07aaed] rounded-full mr-3 shadow-[0_0_10px_#07aaed] group-hover:animate-pulse"></span>${cat}
+                            </h3>
+                            <p class="text-xs text-gray-400 font-medium">Upload up to 5 supported files: image. Max 100 MB per file.</p>
+                        </div>
+                        <div class="relative">
+                            <input type="file" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileUpload(event, '${cat}')">
+                            <div class="bg-white/5 border border-dashed border-[#07aaed]/30 group-hover:border-[#07aaed] text-[#07aaed] py-2.5 px-5 rounded-lg text-sm text-center transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#07aaed]/10 group-hover:shadow-[0_0_15px_rgba(7,170,237,0.2)]">
+                                <i class="ph ph-upload"></i> Select
+                            </div>
+                        </div>
+                    </div>
+                    <div id="thumbs-${cat}" class="mt-4 pt-3 border-t border-white/5 flex gap-2 overflow-x-auto pb-2 custom-scrollbar hidden"></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function handleFileUpload(e, category) {
+            const files = Array.from(e.target.files);
+            if (files.length + uploads[category].length > 5) {
+                showToast(`Maximum 5 files allowed for ${category}`);
+                return;
+            }
+
+            const validFiles = files.filter(f => f.size <= 100 * 1024 * 1024);
+            if (validFiles.length < files.length) {
+                showToast("Some files exceeded the 100MB limit and were skipped.");
+            }
+
+            const newUploads = validFiles.map(file => ({
+                file,
+                preview: URL.createObjectURL(file),
+                name: file.name
+            }));
+
+            uploads[category] = [...uploads[category], ...newUploads];
+            renderUploadsUI();
+            e.target.value = ''; // reset input
+        }
+
+        function removeFile(category, index) {
+            URL.revokeObjectURL(uploads[category][index].preview);
+            uploads[category].splice(index, 1);
+            renderUploadsUI();
+        }
+
+        function getAllUploads() {
+            return Object.entries(uploads).flatMap(([category, files]) => 
+                files.map(f => ({ ...f, category }))
+            );
+        }
+
+        function renderUploadsUI() {
+            // Update individual category thumbnails
+            categories.forEach(cat => {
+                const thumbContainer = document.getElementById(`thumbs-${cat}`);
+                if (!thumbContainer) return;
+                
+                if (uploads[cat].length > 0) {
+                    thumbContainer.classList.remove('hidden');
+                    thumbContainer.innerHTML = uploads[cat].map((file, idx) => `
+                        <div class="thumb-pop relative group/thumb flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border border-white/10">
+                            <img src="${file.preview}" alt="preview" class="w-full h-full object-cover" />
+                            <button onclick="removeFile('${cat}', ${idx})" class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+                                <span class="text-white text-xs font-bold">X</span>
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    thumbContainer.classList.add('hidden');
+                    thumbContainer.innerHTML = '';
+                }
+            });
+
+            // Update Main Gallery Preview
+            const allFiles = getAllUploads();
+            const total = allFiles.length;
+            const emptyState = document.getElementById('preview-empty');
+            const filledState = document.getElementById('preview-filled');
+            const previewGrid = document.getElementById('preview-grid');
+            const previewMore = document.getElementById('preview-more');
+
+            if (total === 0) {
+                emptyState.classList.remove('hidden');
+                filledState.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                filledState.classList.remove('hidden');
+                
+                previewGrid.innerHTML = allFiles.slice(0, 3).map((file, idx) => `
+                    <div class="frame-pop relative overflow-hidden rounded-lg group bg-black md:h-[280px] ${idx === 0 && total === 1 ? 'md:col-span-3 md:h-[400px]' : ''} ${idx === 0 && total === 2 ? 'md:col-span-2' : ''}" style="animation-delay: ${idx * 100}ms">
+                        <img src="${file.preview}" alt="cinematic view" class="w-full h-full object-cover transform transition-transform duration-[2s] group-hover:scale-110 filter brightness-75 contrast-125 saturate-50 group-hover:brightness-110 group-hover:saturate-100"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4">
+                            <span class="text-[#07aaed] text-[10px] font-black tracking-widest uppercase mb-1 drop-shadow-md">${file.category}</span>
+                            <span class="text-white text-sm font-medium truncate drop-shadow-md">${file.name}</span>
+                        </div>
+                        <div class="absolute top-0 left-0 w-full h-[10%] bg-black transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-[10%] bg-black transform translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+                    </div>
+                `).join('');
+
+                if (total > 3) {
+                    previewMore.classList.remove('hidden');
+                    previewMore.innerText = `+ ${total - 3} more photographs`;
+                } else {
+                    previewMore.classList.add('hidden');
+                }
+            }
+        }
+
+        async function submitUploads() {
+            const allFiles = getAllUploads();
+            if(allFiles.length === 0) {
+                showToast("Please upload at least one photograph.");
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="submitUploads()"]');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="relative z-10">Uploading 0%...</span>';
+
+            try {
+                for (let i = 0; i < allFiles.length; i++) {
+                    const { file, category } = allFiles[i];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('category', category);
+
+                    const res = await fetch(`/api/submissions/${currentSubmissionId}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if(!res.ok) throw new Error(`Failed to upload ${file.name}`);
+                    
+                    btn.innerHTML = `<span class="relative z-10">Uploading ${Math.round(((i + 1) / allFiles.length) * 100)}%...</span>`;
+                }
+                
+                goToStep('ONLINE_SUCCESS');
+            } catch (err) {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function initNamingSection() {
+            let selectedCode = 'C';
+            const cards = document.querySelectorAll('.naming-cat-card');
+
+            cards.forEach(card => card.addEventListener('click', () => {
+                cards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedCode = card.dataset.code;
+            }));
+
+            // Architecture: cycle the "A" through random letters while hovered
+            const archCard = document.querySelector('.naming-cat-arch');
+            if (archCard) {
+                const archLetterEl = archCard.querySelector('.naming-cat-code');
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                let archInterval = null;
+                archCard.addEventListener('mouseenter', () => {
+                    clearInterval(archInterval);
+                    archInterval = setInterval(() => {
+                        archLetterEl.textContent = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }, 90);
+                });
+                archCard.addEventListener('mouseleave', () => {
+                    clearInterval(archInterval);
+                    archLetterEl.textContent = 'A';
+                });
+            }
+
+            // Mobile category carousel: fade cards that aren't centered, drag/scroll horizontally
+            const grid = document.getElementById('naming-cat-grid');
+            function setupMobileCarousel() {
+                const isMobile = window.matchMedia('(max-width: 640px)').matches;
+                if (isMobile) {
+                    grid.classList.add('naming-cat-grid-mobile');
+                    const obs = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            entry.target.classList.toggle('in-view', entry.isIntersecting && entry.intersectionRatio > 0.6);
+                        });
+                    }, { root: grid, threshold: [0, 0.6, 1] });
+                    cards.forEach(c => obs.observe(c));
+                } else {
+                    grid.classList.remove('naming-cat-grid-mobile');
+                }
+            }
+            setupMobileCarousel();
+            window.addEventListener('resize', setupMobileCarousel);
+
+            // Rename walkthrough mockups: desktop mockup demos desktop renaming,
+            // mobile mockup demos mobile renaming — both run independently, no manual switch.
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+            async function runDemo(view) {
+                const p = view === 'desktop' ? 'naming-desk' : 'naming-mob';
+                const photo = document.getElementById(`${p}-photo`);
+                const blur = document.getElementById(`${p}-blur`);
+                const panel = document.getElementById(`${p}-panel`);
+                const save = document.getElementById(`${p}-save`);
+                const typing = document.getElementById(`${p}-typing`);
+                if (!photo) return;
+
+                while (true) {
+                    photo.classList.remove('minimized', 'focused');
+                    blur.classList.remove('active'); panel.classList.remove('active');
+                    save.classList.remove('ready'); typing.textContent = 'IMG_8492.JPEG';
+                    await sleep(1200);
+                    photo.classList.add('focused'); blur.classList.add('active');
+                    await sleep(600);
+                    panel.classList.add('active');
+                    await sleep(1200);
+                    const text = `SUNSET_${selectedCode}_YOURNAME`;
+                    for (let i = 0; i < text.length; i++) {
+                        typing.textContent = text.substring(0, i + 1) + '.JPEG';
+                        await sleep(70);
+                    }
+                    await sleep(400);
+                    save.classList.add('ready');
+                    await sleep(700);
+                    panel.classList.remove('active'); blur.classList.remove('active'); photo.classList.remove('focused');
+                    await sleep(400);
+                    photo.classList.add('minimized');
+                    await sleep(1800);
+                }
+            }
+            runDemo('desktop');
+            runDemo('mobile');
+        }
+
+        function resetAndGoHome() {
+            // Revoke URLs to prevent memory leak
+            getAllUploads().forEach(file => URL.revokeObjectURL(file.preview));
+            uploads = { Color: [], Monochrome: [], Wildlife: [], Macro: [], Street: [], Architecture: [], Mobile: [] };
+            goToStep('HOME');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initProgressRail();
+            initUploadUI();
+            initNamingSection();
+
+            // Boot Sequence
+            setTimeout(() => {
+                document.getElementById('boot-top').style.height = '0';
+                document.getElementById('boot-bottom').style.height = '0';
+                setTimeout(() => document.getElementById('boot-curtains').remove(), 1000);
+            }, 60);
+
+            initWebGLBackground();
+            initParticleField();
+            initCursorGlow();
+        });
+
+        function initWebGLBackground() {
+            const canvas = document.getElementById('webgl-canvas');
+            const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
+            if (!gl) return;
+
+            const vsSource = `attribute vec2 position; varying vec2 vUv; void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }`;
+            const fsSource = `
+                precision highp float;
+                uniform float iTime; uniform vec3 iResolution; uniform float uSpinRotation; uniform float uSpinSpeed;
+                uniform vec2 uOffset; uniform vec4 uColor1; uniform vec4 uColor2; uniform vec4 uColor3;
+                uniform float uContrast; uniform float uLighting; uniform float uSpinAmount; uniform float uPixelFilter;
+                uniform float uSpinEase; uniform bool uIsRotate; uniform vec2 uMouse; varying vec2 vUv;
+                float hash(vec2 p) { return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }
+                vec4 effect(vec2 screenSize, vec2 screen_coords) {
+                    float pixel_size = length(screenSize.xy) / uPixelFilter;
+                    vec2 uv = (floor(screen_coords.xy * (1.0 / pixel_size)) * pixel_size - 0.5 * screenSize.xy) / length(screenSize.xy) - uOffset;
+                    float uv_len = length(uv);
+                    float speed = (uSpinRotation * uSpinEase * 0.2) + 302.2;
+                    float mouseInfluence = (uMouse.x * 2.0 - 1.0);
+                    speed += mouseInfluence * 0.1;
+                    float new_pixel_angle = atan(uv.y, uv.x) + speed - uSpinEase * 20.0 * (uSpinAmount * uv_len + (1.0 - uSpinAmount));
+                    vec2 mid = (screenSize.xy / length(screenSize.xy)) / 2.0;
+                    uv = (vec2(uv_len * cos(new_pixel_angle) + mid.x, uv_len * sin(new_pixel_angle) + mid.y) - mid);
+                    uv *= 30.0; speed = (iTime * uSpinSpeed) + mouseInfluence * 2.0;
+                    vec2 uv2 = vec2(uv.x + uv.y);
+                    for(int i = 0; i < 5; i++) {
+                        uv2 += sin(max(uv.x, uv.y)) + uv;
+                        uv += 0.5 * vec2(cos(5.1123314 + 0.353 * uv2.y + speed * 0.131121), sin(uv2.x - 0.113 * speed));
+                        uv -= cos(uv.x + uv.y) - sin(uv.x * 0.711 - uv.y);
+                    }
+                    float contrast_mod = (0.25 * uContrast + 0.5 * uSpinAmount + 1.2);
+                    float paint_res = min(2.0, max(0.0, length(uv) * 0.035 * contrast_mod));
+                    float c1p = max(0.0, 1.0 - contrast_mod * abs(1.0 - paint_res));
+                    float c2p = max(0.0, 1.0 - contrast_mod * abs(paint_res));
+                    float c3p = 1.0 - min(1.0, c1p + c2p);
+                    float light = (uLighting - 0.2) * max(c1p * 5.0 - 4.0, 0.0) + uLighting * max(c2p * 5.0 - 4.0, 0.0);
+                    vec4 col = (0.3 / uContrast) * uColor1 + (1.0 - 0.3 / uContrast) * (uColor1 * c1p + uColor2 * c2p + vec4(c3p * uColor3.rgb, c3p * uColor1.a)) + light;
+                    float grain = (hash(screen_coords + iTime * 60.0) - 0.5) * 0.035; col.rgb += grain;
+                    vec2 vc = (screen_coords / screenSize.xy) - 0.5; float vig = 1.0 - dot(vc, vc) * 1.1; col.rgb *= clamp(vig, 0.35, 1.0);
+                    return col;
+                }
+                void main() { gl_FragColor = effect(iResolution.xy, vUv * iResolution.xy); }
+            `;
+
+            function compile(type, source) {
+                const s = gl.createShader(type);
+                gl.shaderSource(s, source); gl.compileShader(s); return s;
+            }
+            const program = gl.createProgram();
+            gl.attachShader(program, compile(gl.VERTEX_SHADER, vsSource));
+            gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fsSource));
+            gl.linkProgram(program); gl.useProgram(program);
+
+            const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+            const posLoc = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(posLoc); gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            const locs = {
+                iTime: gl.getUniformLocation(program, "iTime"), iResolution: gl.getUniformLocation(program, "iResolution"),
+                uSpinRotation: gl.getUniformLocation(program, "uSpinRotation"), uSpinSpeed: gl.getUniformLocation(program, "uSpinSpeed"),
+                uOffset: gl.getUniformLocation(program, "uOffset"), uColor1: gl.getUniformLocation(program, "uColor1"),
+                uColor2: gl.getUniformLocation(program, "uColor2"), uColor3: gl.getUniformLocation(program, "uColor3"),
+                uContrast: gl.getUniformLocation(program, "uContrast"), uLighting: gl.getUniformLocation(program, "uLighting"),
+                uSpinAmount: gl.getUniformLocation(program, "uSpinAmount"), uPixelFilter: gl.getUniformLocation(program, "uPixelFilter"),
+                uSpinEase: gl.getUniformLocation(program, "uSpinEase"), uIsRotate: gl.getUniformLocation(program, "uIsRotate"),
+                uMouse: gl.getUniformLocation(program, "uMouse"),
+            };
+
+            const hexToRgba = (hex) => { let h=hex.replace('#',''); return [parseInt(h.substring(0,2),16)/255, parseInt(h.substring(2,4),16)/255, parseInt(h.substring(4,6),16)/255, 1]; };
+            const c1 = hexToRgba("#000000"), c2 = hexToRgba("#07aaed"), c3 = hexToRgba("#03111f");
+
+            let startTime = Date.now(), mouse = {x: 0.5, y: 0.5}, target = {x: 0.5, y: 0.5};
+            window.addEventListener('mousemove', e => { target.x = e.clientX / window.innerWidth; target.y = 1.0 - (e.clientY / window.innerHeight); });
+
+            function render() {
+                if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+                    canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+                mouse.x += (target.x - mouse.x) * 0.04; mouse.y += (target.y - mouse.y) * 0.04;
+                gl.uniform1f(locs.iTime, (Date.now() - startTime) / 1000.0);
+                gl.uniform3f(locs.iResolution, canvas.width, canvas.height, canvas.width / canvas.height);
+                gl.uniform1f(locs.uSpinRotation, -2.0); gl.uniform1f(locs.uSpinSpeed, 7.0);
+                gl.uniform2f(locs.uOffset, 0.0, 0.0); gl.uniform4f(locs.uColor1, ...c1); gl.uniform4f(locs.uColor2, ...c2); gl.uniform4f(locs.uColor3, ...c3);
+                gl.uniform1f(locs.uContrast, 3.5); gl.uniform1f(locs.uLighting, 0.42); gl.uniform1f(locs.uSpinAmount, 0.25);
+                gl.uniform1f(locs.uPixelFilter, 1310.0); gl.uniform1f(locs.uSpinEase, 1.0); gl.uniform1i(locs.uIsRotate, 0);
+                gl.uniform2f(locs.uMouse, mouse.x, mouse.y);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function initParticleField() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [], w, h;
+
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+
+            const count = window.innerWidth < 768 ? 26 : 55;
+            for(let i = 0; i < count; i++) particles.push({
+                x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.6 + 0.4,
+                vy: -(Math.random() * 0.25 + 0.05), vx: (Math.random() - 0.5) * 0.15,
+                o: Math.random() * 0.5 + 0.15, flick: Math.random() * Math.PI * 2
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.y += p.vy; p.x += p.vx; p.flick += 0.02;
+                    if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+                    if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10;
+                    const alpha = p.o * (0.6 + 0.4 * Math.sin(p.flick));
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(7, 170, 237, ${alpha})`; ctx.shadowColor = 'rgba(7,170,237,0.8)'; ctx.shadowBlur = 6; ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function initCursorGlow() {
+            const el = document.getElementById('cursor-glow');
+            if(!el) return;
+            let x = window.innerWidth / 2, y = window.innerHeight / 2, cx = x, cy = y;
+            window.addEventListener('mousemove', e => { x = e.clientX; y = e.clientY; });
+            function loop() {
+                cx += (x - cx) * 0.08; cy += (y - cy) * 0.08;
+                el.style.transform = `translate3d(${cx - 300}px, ${cy - 300}px, 0)`;
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+    </script>
+</body>
+</html>
