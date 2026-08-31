@@ -3,11 +3,18 @@ import multer from 'multer';
 import { supabase } from '../lib/supabase';
 import { setupStudentFolder, uploadPhoto } from '../lib/drive';
 
+import os from 'os';
+
 const router = Router();
 
-// Store files in memory for fast proxying to Google Drive
+// Store files on disk temporarily to prevent out-of-memory crashes on free hosting
 const upload = multer({ 
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: os.tmpdir(),
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname}`);
+    }
+  }),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit per file
 });
 

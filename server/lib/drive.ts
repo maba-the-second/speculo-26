@@ -110,35 +110,41 @@ export async function uploadPhoto(
     parents: [categoryFolderId],
   };
 
-  // Convert buffer to stream
-  const bufferStream = new Readable();
-  bufferStream.push(file.buffer);
-  bufferStream.push(null);
-
   const media = {
     mimeType: file.mimetype,
-    body: bufferStream,
+    body: fs.createReadStream(file.path),
   };
 
-  const driveFile = await driveClient.files.create({
-    requestBody: fileMetadata,
-    media: media,
-    fields: 'id, webViewLink',
-  });
-  
-  // Make the file publicly viewable (or anyone with the link)
-  if (driveFile.data.id) {
-    await driveClient.permissions.create({
-      fileId: driveFile.data.id,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone',
-      }
+  try {
+    const driveFile = await driveClient.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: 'id, webViewLink',
     });
-  }
 
-  return {
-    id: driveFile.data.id!,
-    webViewLink: driveFile.data.webViewLink!,
-  };
+    // Make the file publicly viewable (or anyone with the link)
+    if (driveFile.data.id) {
+      await driveClient.permissions.create({
+        fileId: driveFile.data.id,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        }
+      });
+    }
+
+    // Clean up temporary file from disk
+    fs.unlink(file.path, (err) => {
+      if (err) console.error('Failed to delete temp file:', err);
+    });
+
+    return {
+      id: driveFile.data.id || '',
+      webViewLink: driveFile.data.webViewLink || ''
+    };
+  } catch (error) {
+    // Attempt cleanup even on failure
+    fs.unlink(file.path, () => {});
+    throw error;
+  }
 }
