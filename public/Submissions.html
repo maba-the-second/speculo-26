@@ -963,8 +963,9 @@
             inputs.forEach(el => el.disabled = true);
             submitBtn.innerHTML = '<span class="relative z-10">Submitting...</span>';
 
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
             try {
-                const res = await fetch('/api/submissions', {
+                const res = await fetch(`${API_BASE}/api/submissions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1004,8 +1005,9 @@
             if (currentStep === 'INTER_FORM') type = 'online_inter';
             if (currentStep === 'OPEN_FORM') type = 'online_open';
 
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
             try {
-                const res = await fetch('/api/submissions', {
+                const res = await fetch(`${API_BASE}/api/submissions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1198,7 +1200,8 @@
                     formData.append('file', file);
                     formData.append('category', category);
 
-                    const res = await fetch(`/api/submissions/${currentSubmissionId}/upload`, {
+                    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
+                    const res = await fetch(`${API_BASE}/api/submissions/${currentSubmissionId}/upload`, {
                         method: 'POST',
                         body: formData
                     });

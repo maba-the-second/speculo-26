@@ -8,15 +8,23 @@ dotenv.config();
 
 const ROOT_FOLDER_ID = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID || '';
 const KEY_FILE = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || './service-account.json';
+const CRED_JSON = process.env.GOOGLE_CREDENTIALS_JSON;
 
 // Initialize the Google Drive Client
 let driveClient: ReturnType<typeof google.drive> | null = null;
 
 try {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: KEY_FILE,
+  let authConfig: any = {
     scopes: ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive'],
-  });
+  };
+
+  if (CRED_JSON) {
+    authConfig.credentials = JSON.parse(CRED_JSON);
+  } else {
+    authConfig.keyFile = KEY_FILE;
+  }
+
+  const auth = new google.auth.GoogleAuth(authConfig);
   driveClient = google.drive({ version: 'v3', auth });
 } catch (error) {
   console.error('Failed to initialize Google Drive client:', error);
