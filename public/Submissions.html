@@ -963,7 +963,7 @@
             inputs.forEach(el => el.disabled = true);
             submitBtn.innerHTML = '<span class="relative z-10">Submitting...</span>';
 
-            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-26.onrender.com';
             try {
                 const res = await fetch(`${API_BASE}/api/submissions`, {
                     method: 'POST',
@@ -1005,7 +1005,7 @@
             if (currentStep === 'INTER_FORM') type = 'online_inter';
             if (currentStep === 'OPEN_FORM') type = 'online_open';
 
-            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-26.onrender.com';
             try {
                 const res = await fetch(`${API_BASE}/api/submissions`, {
                     method: 'POST',
@@ -1200,7 +1200,7 @@
                     formData.append('file', file);
                     formData.append('category', category);
 
-                    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-backend.onrender.com';
+                    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://speculo-26.onrender.com';
                     const res = await fetch(`${API_BASE}/api/submissions/${currentSubmissionId}/upload`, {
                         method: 'POST',
                         body: formData
