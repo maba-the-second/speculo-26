@@ -409,57 +409,114 @@
                 </div>
             </div>
 
-            <div id="step-PHYSICAL_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8">
-                <div class="pointer-events-none absolute inset-0 opacity-60"><div class="absolute -inset-[1px] rounded-2xl border-sheen"></div></div>
-                <div class="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-[#07aaed]/10 rounded-full blur-3xl"></div>
-                <div class="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 bg-[#07aaed]/5 rounded-full blur-3xl"></div>
+            <div id="step-PHYSICAL_FORM" class="step-view relative bg-black/40 backdrop-blur-2xl border border-[#07aaed]/20 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] rounded-2xl panel-enter overflow-hidden p-8 max-w-4xl mx-auto custom-scrollbar" style="max-height: 85vh; overflow-y: auto;">
                 
-                <div class="relative z-10">
-                    <button onclick="goToStep('HOME')" class="text-gray-400 hover:text-white mb-8 flex items-center text-sm font-medium transition-colors group">
-                        <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
-                    </button>
-                    <h2 class="text-2xl font-bold mb-8 text-[#07aaed] uppercase tracking-wider border-b border-[#07aaed]/20 pb-4">Physical Submission Form</h2>
+                <button onclick="goToStep('HOME')" class="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center text-sm font-medium transition-colors group">
+                    <i class="ph ph-caret-left mr-1 transition-transform group-hover:-translate-x-1"></i> Back
+                </button>
+                <h2 class="text-3xl font-black mb-8 text-white uppercase tracking-widest text-center mt-6">Physical Photography Competition</h2>
+
+                <!-- Consent Section -->
+                <div id="physical-consent-section" class="max-w-2xl mx-auto mt-12 mb-8">
+                    <div class="bg-[#07aaed]/10 border border-[#07aaed]/30 rounded-xl p-6 mb-6 shadow-[0_0_20px_rgba(7,170,237,0.1)]">
+                        <h3 class="text-[#07aaed] font-bold mb-2 text-lg">Submission Policy:</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">This form can only be completed once per school photography club. This is not an individual form, so please ensure it is fulfilled only once by one authorized school coordinator.</p>
+                    </div>
                     
-                    <form onsubmit="handlePhysicalSubmit(event)" class="space-y-6">
-                        <div class="flex flex-col mb-4 input-enter">
-                            <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Name of the participant <span class="text-[#07aaed]">*</span></label>
-                            <input type="text" name="name" required placeholder="Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
-                        </div>
-                        <div class="flex flex-col mb-4 input-enter">
-                            <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Email <span class="text-[#07aaed]">*</span></label>
-                            <input type="email" name="email" required placeholder="your@email.com" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="flex flex-col mb-4 input-enter">
-                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Date of Birth <span class="text-[#07aaed]">*</span></label>
-                                <input type="date" name="dob" required style="color-scheme: dark" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                    <div class="bg-black/40 border border-white/10 rounded-xl p-5 flex items-center gap-4 mb-6 cursor-pointer hover:bg-white/5 transition-colors group" onclick="document.getElementById('consent-checkbox').click()">
+                        <input type="checkbox" id="consent-checkbox" class="w-5 h-5 accent-[#07aaed] rounded cursor-pointer" onchange="const btn = document.getElementById('consent-continue'); btn.disabled = !this.checked; btn.classList.toggle('opacity-50', !this.checked); btn.classList.toggle('cursor-not-allowed', !this.checked);">
+                        <label for="consent-checkbox" class="text-white cursor-pointer font-medium select-none group-hover:text-[#07aaed] transition-colors">I have understood the submission policy</label>
+                    </div>
+
+                    <button id="consent-continue" disabled class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 bg-[#07aaed] text-black opacity-50 cursor-not-allowed hover:shadow-[0_0_35px_rgba(7,170,237,0.65)]" onclick="document.getElementById('physical-consent-section').style.display='none'; document.getElementById('physical-form-section').style.display='block';">
+                        Continue
+                    </button>
+                </div>
+
+                <!-- Form Section -->
+                <div id="physical-form-section" class="max-w-3xl mx-auto mt-8" style="display: none;">
+                    <form onsubmit="handlePhysicalSubmit(event)" class="space-y-8">
+                        
+                        <!-- SECTION 1 -->
+                        <div>
+                            <div class="flex justify-between items-end border-b border-[#07aaed]/20 pb-2 mb-6">
+                                <h3 class="text-[#07aaed] font-bold tracking-wider text-sm uppercase">SCHOOL & COORDINATOR INFORMATION</h3>
+                                <button type="button" class="text-gray-400 text-xs hover:text-[#07aaed] transition-colors" onclick="document.getElementById('physical-form-section').style.display='none'; document.getElementById('physical-consent-section').style.display='block';">View Policy</button>
                             </div>
-                            <div class="flex flex-col mb-4 input-enter">
-                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">School</label>
-                                <input type="text" name="school" placeholder="School Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
-                            </div>
-                        </div>
-                        <div class="flex flex-col mb-4 input-enter">
-                            <label id="physical-president-label" class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Photography Club President's Name</label>
-                            <input type="text" name="president" placeholder="President's Full Name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="flex flex-col mb-4 input-enter">
-                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label>
-                                <div class="relative flex group">
-                                    <span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400 transition-colors group-focus-within:border-[#07aaed]/60 group-focus-within:text-[#07aaed]">+94</span>
-                                    <input type="text" name="phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+
+                            <div class="space-y-5">
+                                <div class="flex flex-col input-enter">
+                                    <label class="text-sm text-gray-300 mb-1.5 font-medium">Name of the School <span class="text-[#07aaed]">*</span></label>
+                                    <input type="text" name="school" required placeholder="Enter school name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                </div>
+                                <div class="flex flex-col input-enter">
+                                    <label class="text-sm text-gray-300 mb-1.5 font-medium">Name of the President <span class="text-[#07aaed]">*</span></label>
+                                    <input type="text" name="president" required placeholder="Enter full name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div class="flex flex-col input-enter">
+                                        <label class="text-sm text-gray-300 mb-1.5 font-medium">President Contact Number (WhatsApp) <span class="text-[#07aaed]">*</span></label>
+                                        <div class="relative flex group">
+                                            <span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400 transition-colors group-focus-within:border-[#07aaed]/60 group-focus-within:text-[#07aaed]">+94</span>
+                                            <input type="text" name="president_phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event); handleInputChange(event);" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col input-enter">
+                                        <label class="text-sm text-gray-300 mb-1.5 font-medium">Email Address <span class="text-[#07aaed]">*</span></label>
+                                        <input type="email" name="email" required placeholder="Enter email address" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div class="flex flex-col input-enter">
+                                        <label class="text-sm text-gray-300 mb-1.5 font-medium">Name of Master in Charge <span class="text-[#07aaed]">*</span></label>
+                                        <input type="text" name="mic_name" required placeholder="Enter full name" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                    </div>
+                                    <div class="flex flex-col input-enter">
+                                        <label class="text-sm text-gray-300 mb-1.5 font-medium">Contact Number of Master in Charge (WhatsApp) <span class="text-[#07aaed]">*</span></label>
+                                        <div class="relative flex group">
+                                            <span class="inline-flex items-center px-4 rounded-l-lg bg-black/60 border border-r-0 border-white/10 text-gray-400 transition-colors group-focus-within:border-[#07aaed]/60 group-focus-within:text-[#07aaed]">+94</span>
+                                            <input type="text" name="mic_phone" required placeholder="_ _ _ _ _ _ _ _ _" maxlength="9" oninput="handlePhoneChange(event); handleInputChange(event);" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-r-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex flex-col mb-4 input-enter">
-                                <label class="text-sm text-gray-300 mb-1.5 font-medium tracking-wide">Grade</label>
-                                <input type="text" name="grade" id="physical-grade-input" placeholder="e.g. Grade 12" oninput="handleInputChange(event)" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 focus:bg-white/[0.07] transition-all duration-300">
+                        </div>
+
+                        <!-- SECTION 2 -->
+                        <div class="bg-white/5 border border-white/10 rounded-xl p-6 relative">
+                            <label class="text-sm text-gray-300 mb-4 font-medium flex justify-between items-center">
+                                <span>Number of Participants (Max 10 with MIC) <span class="text-[#07aaed]">*</span></span>
+                                <span id="participants-display" class="bg-[#07aaed]/20 text-[#07aaed] px-3 py-1 rounded text-xs font-bold border border-[#07aaed]/30">1</span>
+                            </label>
+                            <input type="range" name="participants_count" id="participants-slider" min="1" max="10" value="1" class="w-full accent-[#07aaed] mt-2 cursor-pointer" oninput="document.getElementById('participants-display').innerText = this.value; handleInputChange(event); validateDietary();">
+                            <div class="flex justify-between text-xs text-gray-500 mt-3 px-1 font-medium">
+                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                             </div>
                         </div>
-                        <div class="pt-6">
-                            <button type="submit" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">
+
+                        <!-- SECTION 3 -->
+                        <div>
+                            <div class="flex justify-between items-end border-b border-[#07aaed]/20 pb-2 mb-6 mt-8">
+                                <h3 class="text-[#07aaed] font-bold tracking-wider text-sm uppercase">DIETARY ALLOCATION</h3>
+                                <span id="dietary-status" class="text-xs font-medium text-green-400">Allocated: 1 / 1</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="flex flex-col input-enter">
+                                    <label class="text-sm text-gray-300 mb-1.5 font-medium">Number of Non-Veg Participants</label>
+                                    <input type="number" id="non-veg-input" name="non_veg_count" value="0" min="0" max="10" oninput="handleInputChange(event); validateDietary();" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                </div>
+                                <div class="flex flex-col input-enter">
+                                    <label class="text-sm text-gray-300 mb-1.5 font-medium">Number of Veg Participants</label>
+                                    <input type="number" id="veg-input" name="veg_count" value="1" min="0" max="10" oninput="handleInputChange(event); validateDietary();" class="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#07aaed] focus:ring-1 focus:ring-[#07aaed]/50 transition-all">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-8">
+                            <button type="submit" id="physical-submit-btn" class="w-full py-4 rounded-lg font-bold text-lg tracking-wider uppercase transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-transparent via-[#07aaed]/20 to-transparent border border-[#07aaed] text-[#07aaed] hover:bg-[#07aaed] hover:text-black hover:shadow-[0_0_35px_rgba(7,170,237,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">
                                 <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"></span>
-                                <span class="relative z-10 flex items-center justify-center gap-2">Submit Details</span>
+                                <span class="relative z-10 flex items-center justify-center gap-2">Submit Registration</span>
                             </button>
                         </div>
                     </form>
@@ -1465,6 +1522,38 @@
             }
             loop();
         }
+    </script>
+
+    <script>
+        function validateDietary() {
+            const total = parseInt(document.getElementById('participants-slider').value) || 0;
+            const nonVeg = parseInt(document.getElementById('non-veg-input').value) || 0;
+            const veg = parseInt(document.getElementById('veg-input').value) || 0;
+            const current = nonVeg + veg;
+            
+            const status = document.getElementById('dietary-status');
+            const submitBtn = document.getElementById('physical-submit-btn');
+
+            status.innerText = `Allocated: ${current} / ${total}`;
+
+            if (current !== total) {
+                status.classList.add('text-red-400');
+                status.classList.remove('text-green-400', 'text-gray-400');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                status.classList.add('text-green-400');
+                status.classList.remove('text-red-400', 'text-gray-400');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            formData.participants_count = "1";
+            formData.non_veg_count = "0";
+            formData.veg_count = "1";
+        });
     </script>
 </body>
 </html>

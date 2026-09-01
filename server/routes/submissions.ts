@@ -23,31 +23,38 @@ const upload = multer({
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { type, name, email, phone, dob, grade, school, president } = req.body;
+    const { type, school, president, president_phone, email, mic_name, mic_phone, participants_count, non_veg_count, veg_count, name, phone, dob, grade } = req.body;
 
-    if (!type || !name || !phone) {
+    if (!type || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Set up Google Drive folders
-    const driveFolderId = await setupStudentFolder(type, school, name);
+      const folderName = type === 'physical' ? school : name;
+      const driveFolderId = await setupStudentFolder(type, school, folderName);
 
-    // Insert into Supabase
-    const { data, error } = await supabase
-      .from('submissions')
-      .insert([
-        {
-          type,
-          name,
-          email,
-          phone,
-          dob,
-          grade,
-          school,
-          president,
-          drive_folder_id: driveFolderId
-        }
-      ])
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('submissions')
+        .insert([
+          {
+            type,
+            name: name || null,
+            email,
+            phone: phone || null,
+            dob: dob || null,
+            grade: grade || null,
+            school,
+            president,
+            president_phone,
+            mic_name,
+            mic_phone,
+            participants_count: participants_count ? parseInt(participants_count) : null,
+            non_veg_count: non_veg_count ? parseInt(non_veg_count) : null,
+            veg_count: veg_count ? parseInt(veg_count) : null,
+            drive_folder_id: driveFolderId
+          }
+        ])
       .select()
       .single();
 

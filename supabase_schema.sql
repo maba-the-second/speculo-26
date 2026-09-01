@@ -27,3 +27,14 @@ CREATE TABLE submission_photos (
 
 -- Note: No Row Level Security (RLS) policies are defined here 
 -- because all backend operations are performed securely via the Service Role Key.
+
+-- ADD THESE COLUMNS IF YOU ARE UPDATING FROM AN OLDER VERSION:
+-- ALTER TABLE submissions ADD COLUMN president_phone TEXT;
+-- ALTER TABLE submissions ADD COLUMN mic_name TEXT;
+-- ALTER TABLE submissions ADD COLUMN mic_phone TEXT;
+-- ALTER TABLE submissions ADD COLUMN participants_count INTEGER;
+-- ALTER TABLE submissions ADD COLUMN non_veg_count INTEGER;
+-- ALTER TABLE submissions ADD COLUMN veg_count INTEGER;
+-- ALTER TABLE submissions ALTER COLUMN name DROP NOT NULL;
+-- ALTER TABLE submissions ALTER COLUMN phone DROP NOT NULL;
+
