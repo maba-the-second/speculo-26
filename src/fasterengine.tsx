@@ -554,18 +554,20 @@ export function useFasterScrubber({
       const iframe = mainIframeRef.current;
       if (!iframe) return;
 
+      const base = import.meta.env.BASE_URL;
+
       if (targetId === "themes") {
-        iframe.src = "/themes.html";
+        iframe.src = `${base}themes.html`;
         return;
       }
       if (targetId === "submissions") {
-        iframe.src = "/Submissions.html";
+        iframe.src = `${base}Submissions.html`;
         return;
       }
 
       const currentSrc = iframe.src || "";
       if (!currentSrc.includes("main.html")) {
-        iframe.src = targetId ? `/main.html#${targetId}` : "/main.html";
+        iframe.src = targetId ? `${base}main.html#${targetId}` : `${base}main.html`;
         return;
       }
 
