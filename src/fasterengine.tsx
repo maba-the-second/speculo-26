@@ -26,7 +26,7 @@ export const PC_FRAME_COUNT = 194;
 export const MOBILE_FRAME_COUNT = 267;
 
 export const CRITICAL_LOGOS = [
-  "/logo-white.png",
+  `${import.meta.env.BASE_URL}logo-white.png`,
   "https://raw.githubusercontent.com/dulajbandara28-sketch/Rajans-Media-unit/main/Logo%20White.png",
 ];
 
@@ -47,8 +47,8 @@ export const GALLERY_BACKGROUND_IMAGES = [
 ];
 
 export const EXHIBITION_PAGES = [
-  "/themes.html",
-  "/Submissions.html",
+  `${import.meta.env.BASE_URL}themes.html`,
+  `${import.meta.env.BASE_URL}Submissions.html`,
 ];
 
 /* ============================================================================
@@ -175,7 +175,9 @@ export function FasterEngineProvider({ children }: { children: React.ReactNode }
   });
 
   const frameCount = isMobile ? MOBILE_FRAME_COUNT : PC_FRAME_COUNT;
-  const framePrefix = isMobile ? '/hero_mobile/ezgif-frame-' : '/hero_pc/ezgif-frame-';
+  
+  const base = import.meta.env.BASE_URL;
+  const framePrefix = isMobile ? `${base}hero_mobile/ezgif-frame-` : `${base}hero_pc/ezgif-frame-`;
   
   const framesRef = useRef<HTMLImageElement[]>([]);
   const framesLoadedCount = useRef(0);
