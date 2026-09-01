@@ -71,18 +71,26 @@ export async function getOrCreateFolder(parentId: string, folderName: string, cr
 export async function setupStudentFolder(type: string, school: string | null, studentName: string): Promise<string> {
   if (!ROOT_FOLDER_ID) throw new Error('Root folder ID not set');
 
-  let parentGroupFolderId = ROOT_FOLDER_ID;
+  let baseLevelFolderId = ROOT_FOLDER_ID;
 
+  // 1. Top level: Physical vs Online
   if (type === 'physical') {
-    parentGroupFolderId = await getOrCreateFolder(ROOT_FOLDER_ID, '_Physical') || ROOT_FOLDER_ID;
-  } else if (type === 'online_open') {
-    parentGroupFolderId = await getOrCreateFolder(ROOT_FOLDER_ID, '_Open Category') || ROOT_FOLDER_ID;
-  } else if (school) {
-    // Inter or Intra with school name
-    parentGroupFolderId = await getOrCreateFolder(ROOT_FOLDER_ID, school) || ROOT_FOLDER_ID;
+    baseLevelFolderId = await getOrCreateFolder(ROOT_FOLDER_ID, 'Physical') || ROOT_FOLDER_ID;
+  } else {
+    baseLevelFolderId = await getOrCreateFolder(ROOT_FOLDER_ID, 'Online') || ROOT_FOLDER_ID;
   }
 
-  // Create student folder
+  // 2. Sub-level: School or Category
+  let parentGroupFolderId = baseLevelFolderId;
+  
+  if (type === 'online_open') {
+    parentGroupFolderId = await getOrCreateFolder(baseLevelFolderId, 'Open Category') || baseLevelFolderId;
+  } else if (school) {
+    // Inter, Intra, or Physical with a school name
+    parentGroupFolderId = await getOrCreateFolder(baseLevelFolderId, school) || baseLevelFolderId;
+  }
+
+  // 3. Student folder
   const studentFolderId = await getOrCreateFolder(parentGroupFolderId, studentName);
   if (!studentFolderId) throw new Error('Failed to create student folder');
   
