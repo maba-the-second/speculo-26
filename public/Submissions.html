@@ -1027,13 +1027,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         type: 'physical',
-                        name: formData.name,
-                        email: formData.email,
-                        phone: formData.phone,
-                        dob: formData.dob,
-                        grade: e.target.querySelector('[name="grade"]')?.value || null,
                         school: formData.school,
-                        president: formData.president
+                        president: formData.president,
+                        president_phone: formData.president_phone,
+                        email: formData.email,
+                        mic_name: formData.mic_name,
+                        mic_phone: formData.mic_phone,
+                        participants_count: formData.participants_count || "1",
+                        non_veg_count: formData.non_veg_count || "0",
+                        veg_count: formData.veg_count || "1"
                     })
                 });
                 

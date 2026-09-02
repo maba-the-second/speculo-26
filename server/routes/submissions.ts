@@ -25,8 +25,8 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const { type, school, president, president_phone, email, mic_name, mic_phone, participants_count, non_veg_count, veg_count, name, phone, dob, grade } = req.body;
 
-    if (!type || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!type) {
+      return res.status(400).json({ error: 'Missing type field' });
     }
 
     // Set up Google Drive folders
