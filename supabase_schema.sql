@@ -38,3 +38,45 @@ CREATE TABLE submission_photos (
 -- ALTER TABLE submissions ALTER COLUMN name DROP NOT NULL;
 -- ALTER TABLE submissions ALTER COLUMN phone DROP NOT NULL;
 
+
+-- ==========================================
+-- VIEWS TO SEPARATE ONLINE AND PHYSICAL DATA
+-- ==========================================
+
+-- 1. Online Submissions View
+CREATE OR REPLACE VIEW online_submissions_view AS
+SELECT 
+    id,
+    type AS category,
+    name AS participant_name,
+    email,
+    phone,
+    dob AS date_of_birth,
+    grade,
+    school,
+    'https://drive.google.com/drive/folders/' || drive_folder_id AS google_drive_link,
+    created_at
+FROM 
+    submissions
+WHERE 
+    type != 'physical';
+
+-- 2. Physical Submissions View
+CREATE OR REPLACE VIEW physical_submissions_view AS
+SELECT 
+    id,
+    school,
+    president AS president_name,
+    president_phone,
+    email,
+    mic_name AS master_in_charge,
+    mic_phone AS mic_contact,
+    participants_count,
+    veg_count,
+    non_veg_count,
+    created_at
+FROM 
+    submissions
+WHERE 
+    type = 'physical';
+
