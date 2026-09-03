@@ -30,13 +30,14 @@ function SpeculoLogoMobile({ className = '' }: { className?: string }) {
   );
 }
 
-interface CameraMenuMobileProps {
+export interface CameraMenuMobileProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (item: MenuItem) => void;
+  onSwitchToLandscape?: () => void;
 }
 
-export function CameraMenuMobile({ isOpen, onClose, onNavigate }: CameraMenuMobileProps) {
+export function CameraMenuMobile({ isOpen, onClose, onNavigate, onSwitchToLandscape }: CameraMenuMobileProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isWebcamMode, setIsWebcamMode] = useState(false);
   const [dialRotation, setDialRotation] = useState(0);
@@ -134,6 +135,22 @@ export function CameraMenuMobile({ isOpen, onClose, onNavigate }: CameraMenuMobi
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
+
+  // Listen for device orientation to switch back to landscape if rotated
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOrientation = () => {
+      if (window.innerWidth > window.innerHeight && onSwitchToLandscape) {
+        onSwitchToLandscape();
+      }
+    };
+    window.addEventListener('resize', handleOrientation, { passive: true });
+    window.addEventListener('orientationchange', handleOrientation, { passive: true });
+    return () => {
+      window.removeEventListener('resize', handleOrientation);
+      window.removeEventListener('orientationchange', handleOrientation);
+    };
+  }, [isOpen, onSwitchToLandscape]);
 
   useEffect(() => {
     let interval: any;
