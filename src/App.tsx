@@ -115,7 +115,7 @@ function SpeculoAppInner() {
     <div
       id="main-content"
       role="main"
-      className="w-full h-screen bg-[#020508] overflow-hidden relative font-sans select-none"
+      className="w-full h-[100dvh] bg-[#020508] overflow-hidden relative font-sans select-none"
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
