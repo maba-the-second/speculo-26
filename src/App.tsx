@@ -4,7 +4,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-
 import { TargetCursor } from "./components/TargetCursor";
 import { MagicRings } from "./components/MagicRings";
 import {
@@ -27,15 +26,11 @@ function SpeculoAppInner() {
   const {
     phase,
     stage,
-    markVideoReady,
-    markVideoFirstFrame,
     isMobile,
-    activeVideoSrc,
     registerProgressRef,
     registerBarRef,
   } = useFasterEngine();
 
-  const [gsapLoaded, setGsapLoaded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -44,34 +39,21 @@ function SpeculoAppInner() {
     return window.innerWidth > window.innerHeight;
   });
 
-  const [isMobileDevice, setIsMobileDevice] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return (
-      window.innerWidth <= 768 ||
-      (window.innerWidth <= 1024 && window.innerHeight <= 600) ||
-      window.matchMedia("(pointer: coarse)").matches
-    );
-  });
-
   useEffect(() => {
     const handleOrientation = () => {
       setIsLandscape(window.innerWidth > window.innerHeight);
-      setIsMobileDevice(
-        window.innerWidth <= 768 ||
-        (window.innerWidth <= 1024 && window.innerHeight <= 600) ||
-        window.matchMedia("(pointer: coarse)").matches
-      );
     };
-    window.addEventListener("resize", handleOrientation, { passive: true });
-    window.addEventListener("orientationchange", handleOrientation, { passive: true });
+    window.addEventListener("resize", handleOrientation);
+    window.addEventListener("orientationchange", handleOrientation);
     return () => {
       window.removeEventListener("resize", handleOrientation);
       window.removeEventListener("orientationchange", handleOrientation);
     };
   }, []);
 
-  // Stage & Video DOM Refs
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Stage & Canvas DOM Refs
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoStageRef = useRef<HTMLDivElement | null>(null);
   const homeStageRef = useRef<HTMLDivElement | null>(null);
   const mainIframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -81,10 +63,9 @@ function SpeculoAppInner() {
     handleWheel,
     handleTouchStart,
     handleTouchMove,
-    onSeeked,
     navigateInstant,
   } = useFasterScrubber({
-    videoRef,
+    canvasRef,
     videoStageRef,
     homeStageRef,
     mainIframeRef,
@@ -92,68 +73,6 @@ function SpeculoAppInner() {
       if (!hasScrolled) setHasScrolled(true);
     },
   });
-
-  /* ============================================================================
-     GSAP DYNAMIC LOADER
-     ============================================================================ */
-
-  useEffect(() => {
-    if ((window as any).gsap) {
-      setGsapLoaded(true);
-      return;
-    }
-
-    const existing = document.querySelector("script[data-speculo-gsap]");
-    if (existing) {
-      existing.addEventListener("load", () => setGsapLoaded(true), {
-        once: true,
-      });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
-    script.async = true;
-    script.dataset.speculoGsap = "true";
-    script.onload = () => setGsapLoaded(true);
-    document.head.appendChild(script);
-  }, []);
-
-  /* ============================================================================
-     FIRST FRAME & READY DETECTION
-     ============================================================================ */
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const videoAny = video as HTMLVideoElement & {
-      requestVideoFrameCallback?: (
-        callback: (now: number, metadata: any) => void
-      ) => number;
-      cancelVideoFrameCallback?: (handle: number) => void;
-    };
-
-    let callbackId: number | null = null;
-
-    if (typeof videoAny.requestVideoFrameCallback === "function") {
-      callbackId = videoAny.requestVideoFrameCallback(() => {
-        markVideoFirstFrame();
-        markVideoReady();
-      });
-    }
-
-    return () => {
-      if (
-        callbackId !== null &&
-        typeof videoAny.cancelVideoFrameCallback === "function"
-      ) {
-        try {
-          videoAny.cancelVideoFrameCallback(callbackId);
-        } catch {}
-      }
-    };
-  }, [activeVideoSrc, markVideoFirstFrame, markVideoReady]);
 
   /* ============================================================================
      IFRAME EVENT FORWARDING
@@ -194,6 +113,8 @@ function SpeculoAppInner() {
 
   return (
     <div
+      id="main-content"
+      role="main"
       className="w-full h-screen bg-[#020508] overflow-hidden relative font-sans select-none"
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
@@ -203,120 +124,13 @@ function SpeculoAppInner() {
           HIGH-PERFORMANCE TARGET CURSOR
           ====================================================================== */}
 
-      {gsapLoaded && (
-        <TargetCursor
-          spinDuration={3.5}
-          hideDefaultCursor={false}
-          parallaxOn={true}
-          hoverDuration={0.25}
-          cursorColorOnTarget="#64DFDF"
-        />
-      )}
-
-      {/* ======================================================================
-          GLOBAL STYLES & PERFORMANCE MATRICES
-          ====================================================================== */}
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
-        .orbitron-font {
-          font-family: 'Orbitron', sans-serif;
-        }
-
-        .target-cursor-wrapper {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 0;
-          height: 0;
-          pointer-events: none;
-          z-index: 999999;
-          transform: translate(-50%, -50%);
-        }
-
-        .target-cursor-dot {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 4px;
-          height: 4px;
-          background: #64DFDF;
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          will-change: transform;
-          box-shadow: 0 0 8px rgba(100,223,223,0.8);
-          pointer-events: none;
-        }
-
-        .target-cursor-corner {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 12px;
-          height: 12px;
-          border: 2px solid #64DFDF;
-          will-change: transform;
-          filter: drop-shadow(0 0 4px rgba(100,223,223,0.5));
-          pointer-events: none;
-        }
-
-        .corner-tl {
-          border-right: none;
-          border-bottom: none;
-        }
-
-        .corner-tr {
-          border-left: none;
-          border-bottom: none;
-        }
-
-        .corner-br {
-          border-left: none;
-          border-top: none;
-        }
-
-        .corner-bl {
-          border-right: none;
-          border-top: none;
-        }
-
-        .cursor-follower,
-        .mouse-circle,
-        .cursor-circle,
-        .cursor-light {
-          display: none !important;
-          opacity: 0 !important;
-          visibility: hidden !important;
-          pointer-events: none !important;
-        }
-
-        .speculo-video {
-          transform: translate3d(0,0,0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-          will-change: transform;
-          contain: layout paint;
-          object-position: center center;
-        }
-
-        .speculo-video-stage {
-          isolation: isolate;
-          contain: layout paint;
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-        }
-
-        video {
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        .speculo-video-stage,
-        .speculo-video-stage video {
-          transition: none !important;
-        }
-      `}</style>
+      <TargetCursor
+        spinDuration={3.5}
+        hideDefaultCursor={false}
+        parallaxOn={true}
+        hoverDuration={0.25}
+        cursorColorOnTarget="#64DFDF"
+      />
 
       {/* ======================================================================
           FASTER LOADING SCREEN (ZERO-JANK DIRECT-DOM HUD)
@@ -332,7 +146,7 @@ function SpeculoAppInner() {
             duration-500
             ease-out
             ${
-              phase === "transition"
+              phase === "transition" || phase === "ready"
                 ? "scale-125 opacity-0 blur-xl brightness-150 pointer-events-none"
                 : "scale-100 opacity-100"
             }
@@ -388,7 +202,7 @@ function SpeculoAppInner() {
       )}
 
       {/* ======================================================================
-          DIRECT VIDEO STAGE
+          DIRECT CANVAS STAGE
           ====================================================================== */}
 
       <div
@@ -400,37 +214,9 @@ function SpeculoAppInner() {
         }}
         className="speculo-video-stage absolute inset-0 w-full h-full bg-[#020508] will-change-transform will-change-opacity z-10"
       >
-        <video
-          ref={videoRef}
-          key={activeVideoSrc}
-          src={activeVideoSrc}
-          preload="auto"
-          muted
-          playsInline
-          controls={false}
-          disablePictureInPicture
-          className="speculo-video w-full h-full object-cover select-none pointer-events-none"
-          onLoadedMetadata={(e) => {
-            const vid = e.currentTarget;
-            if (Number.isFinite(vid.duration) && vid.duration > 0) {
-              try {
-                vid.currentTime = 0;
-              } catch {}
-            }
-            markVideoReady();
-          }}
-          onLoadedData={() => {
-            markVideoReady();
-            markVideoFirstFrame();
-          }}
-          onCanPlay={() => {
-            markVideoReady();
-          }}
-          onSeeked={onSeeked}
-          onError={(e) => {
-            console.error("[SPECULO] Video streaming notice", e.currentTarget.error);
-          }}
-          onContextMenu={(e) => e.preventDefault()}
+        <canvas
+          ref={canvasRef}
+          className="speculo-video absolute inset-0 w-full h-full block pointer-events-none"
         />
 
         {/* Scroll Indicator & Tap to Enter */}
@@ -472,7 +258,7 @@ function SpeculoAppInner() {
       >
         <iframe
           ref={mainIframeRef}
-          src="/main.html"
+          src={`${import.meta.env.BASE_URL}main.html`}
           title="Speculo Main Exhibition"
           onLoad={handleIframeLoad}
           className="w-full h-full border-0 bg-[#020508]"
@@ -500,7 +286,7 @@ function SpeculoAppInner() {
           ====================================================================== */}
 
       {phase === "ready" &&
-        (isMobile || isMobileDevice ? (
+        (isMobile ? (
           isLandscape ? (
             <CameraMobileLandscape
               isOpen={isMenuOpen}
