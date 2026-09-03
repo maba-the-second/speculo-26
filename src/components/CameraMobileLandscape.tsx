@@ -53,13 +53,7 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
   const [focusConfidence, setFocusConfidence] = useState(0);
 
   // Dynamic Orientation & Real-time Tilt State
-  const [tiltAngle, setTiltAngle] = useState(0);
-  const [gyroSupported, setGyroSupported] = useState(false);
-  const targetTilt = useRef(0);
-  const currentTilt = useRef(0);
-  const animFrameRef = useRef<number | null>(null);
-  const hasTriggeredPortrait = useRef(false);
-
+            
   const [isDraggingDial, setIsDraggingDial] = useState(false);
   const dialVelocity = useRef(0);
   const lastTimestamp = useRef(0);
@@ -144,102 +138,6 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
       toggleWebcamMode();
     }
   }, [isOpen]);
-
-  // Physical Gyroscope Orientation & Dynamic Roll Tilt Tracking
-  useEffect(() => {
-    if (!isOpen) return;
-
-    hasTriggeredPortrait.current = false;
-    currentTilt.current = 0;
-    targetTilt.current = 0;
-    setTiltAngle(0);
-
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (hasTriggeredPortrait.current) return;
-      const gamma = e.gamma; // [-90, 90] left/right
-      const beta = e.beta;   // [-180, 180] front/back
-      if (gamma === null && beta === null) return;
-
-      setGyroSupported(true);
-      const g = gamma || 0;
-      const b = beta || 0;
-
-      let screenAngle = 0;
-      if (typeof window !== 'undefined' && window.screen?.orientation) {
-        screenAngle = window.screen.orientation.angle || 0;
-      } else if (typeof window !== 'undefined' && 'orientation' in window) {
-        screenAngle = Number((window as any).orientation) || 0;
-      }
-
-      let calculatedAngle = 0;
-      if (screenAngle === 90) {
-        // Landscape with top pointing left
-        calculatedAngle = -b;
-      } else if (screenAngle === 270 || screenAngle === -90) {
-        // Landscape with top pointing right
-        calculatedAngle = b;
-      } else {
-        // Orientation 0 (e.g. tablet, desktop simulator, or unlocked sensor)
-        // Use 2D gravity projection
-        const radB = (b * Math.PI) / 180;
-        const radG = (g * Math.PI) / 180;
-        const angle = Math.atan2(Math.sin(radB), Math.sin(radG)) * (180 / Math.PI);
-        if (angle > 90) calculatedAngle = 180 - angle;
-        else if (angle < -90) calculatedAngle = -180 - angle;
-        else calculatedAngle = angle;
-      }
-
-      // Clamp target angle within [-90, 90]
-      const clamped = Math.max(-90, Math.min(90, calculatedAngle));
-      targetTilt.current = clamped;
-    };
-
-    // Smooth LERP animation loop
-    const updateTiltLoop = () => {
-      const diff = targetTilt.current - currentTilt.current;
-      currentTilt.current += diff * 0.14;
-
-      if (Math.abs(diff) < 0.05) {
-        currentTilt.current = targetTilt.current;
-      }
-
-      const rounded = Math.round(currentTilt.current * 10) / 10;
-      setTiltAngle(rounded);
-
-      // Check if tilt reaches 90 degrees threshold (e.g., >= 80° or <= -80°)
-      if (Math.abs(currentTilt.current) >= 80 && !hasTriggeredPortrait.current) {
-        hasTriggeredPortrait.current = true;
-        playSound('focus-lock');
-        vibrate([20, 40, 20]);
-        setTimeout(() => {
-          if (onSwitchToPortrait) {
-            onSwitchToPortrait();
-          }
-        }, 180);
-        return;
-      }
-
-      animFrameRef.current = requestAnimationFrame(updateTiltLoop);
-    };
-
-    window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-    animFrameRef.current = requestAnimationFrame(updateTiltLoop);
-
-    return () => {
-      window.removeEventListener('deviceorientation', handleOrientation);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isOpen, onSwitchToPortrait]);
-
-  // Request Gyroscope Permission for iOS 13+
-  const requestGyroPermission = async () => {
-    if (typeof (DeviceOrientationEvent as any)?.requestPermission === 'function') {
-      try {
-        const res = await (DeviceOrientationEvent as any).requestPermission();
-        if (res === 'granted') setGyroSupported(true);
-      } catch {}
-    }
-  };
 
   // Simulated Manual Tilt for Testing/Preview on Desktop/Touch
   const setSimulatedTilt = (deg: number) => {
@@ -640,8 +538,8 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
       <div
         className="relative w-full max-w-[1020px] h-[min(96vh,440px)] flex flex-col justify-end pt-8 transition-transform will-change-transform duration-75"
         style={{
-          transform: `rotate(${tiltAngle}deg) scale(${1 - Math.abs(tiltAngle) * 0.0018})`,
-          transformOrigin: '50% 55%',
+          
+          
         }}
       >
 
@@ -745,29 +643,7 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
                 {/* Center / Right Top: Electronic Gyro Spirit Level & Telemetry */}
                 <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto">
                   
-                  {/* Gyro Level Tilt Gauge Button */}
-                  <button
-                    type="button"
-                    onClick={requestGyroPermission}
-                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded border transition-all cursor-pointer ${
-                      Math.abs(tiltAngle) < 1.2
-                        ? 'border-emerald-400/70 bg-emerald-950/80 text-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.35)]'
-                        : Math.abs(tiltAngle) >= 70
-                        ? 'border-cyan-400 bg-cyan-950 text-cyan-200 animate-pulse shadow-[0_0_12px_rgba(34,211,238,0.5)]'
-                        : 'border-cyan-500/30 bg-[#030d12]/85 text-cyan-200'
-                    }`}
-                    title="Electronic Level: Tilt phone to 90° to switch to portrait view"
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${Math.abs(tiltAngle) < 1.2 ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]' : Math.abs(tiltAngle) >= 70 ? 'bg-cyan-300' : 'bg-cyan-400'}`} />
-                    <span className="camera-font text-[9.5px] font-bold tracking-wider">
-                      {Math.abs(tiltAngle) < 1.2 ? 'LEVEL 0.0°' : `TILT ${tiltAngle > 0 ? '+' : ''}${tiltAngle.toFixed(1)}°`}
-                    </span>
-                    {Math.abs(tiltAngle) >= 70 && (
-                      <span className="text-[7.5px] bg-cyan-400 text-black font-extrabold px-1 rounded">
-                        PORTRAIT 90°
-                      </span>
-                    )}
-                  </button>
+                  
 
                   <div className="bg-[#030d12]/80 px-2 py-0.5 rounded border border-cyan-500/30 text-white camera-font text-[10px] font-bold">
                     {currentTime}
@@ -790,48 +666,7 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
                 onClick={triggerFocus}
               >
                 {/* Dynamic Counter-Rotating Gyro Horizon Level Line */}
-                <div
-                  className="absolute pointer-events-none flex items-center justify-center transition-transform duration-75"
-                  style={{
-                    transform: `rotate(${-tiltAngle}deg)`,
-                    width: 'min(240px, 60%)',
-                  }}
-                >
-                  <div className={`h-[1.5px] flex-1 transition-colors duration-150 ${Math.abs(tiltAngle) < 1.2 ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400/40'}`} />
-                  <div className={`w-3 h-3 mx-2 rounded-full border flex items-center justify-center transition-all duration-150 ${Math.abs(tiltAngle) < 1.2 ? 'border-emerald-400 bg-emerald-400/30 shadow-[0_0_10px_#34d399]' : 'border-cyan-400/50 bg-black/40'}`}>
-                    <div className={`w-1 h-1 rounded-full ${Math.abs(tiltAngle) < 1.2 ? 'bg-emerald-300' : 'bg-cyan-300'}`} />
-                  </div>
-                  <div className={`h-[1.5px] flex-1 transition-colors duration-150 ${Math.abs(tiltAngle) < 1.2 ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400/40'}`} />
-                </div>
-
-                {!isWebcamMode && (
-                  <div
-                    className={`focus-bracket-box relative transition-all duration-200 ${
-                      isFocusLocked
-                        ? 'w-28 h-18 sm:w-36 sm:h-24 border border-[#64dfdf] bg-[#64dfdf]/10 shadow-[0_0_15px_rgba(100,223,223,0.5)]'
-                        : isHalfPressed
-                        ? 'w-36 h-24 sm:w-44 sm:h-30 border border-cyan-300 animate-pulse'
-                        : 'w-32 h-20 sm:w-40 sm:h-26 border border-cyan-400/20'
-                    }`}
-                  >
-                    {/* 4 Corner Brackets */}
-                    <div className={`absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 ${isFocusLocked ? 'border-[#64dfdf] shadow-[0_0_8px_#64dfdf]' : 'border-cyan-400'}`} />
-                    <div className={`absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 ${isFocusLocked ? 'border-[#64dfdf] shadow-[0_0_8px_#64dfdf]' : 'border-cyan-400'}`} />
-                    <div className={`absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 ${isFocusLocked ? 'border-[#64dfdf] shadow-[0_0_8px_#64dfdf]' : 'border-cyan-400'}`} />
-                    <div className={`absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 ${isFocusLocked ? 'border-[#64dfdf] shadow-[0_0_8px_#64dfdf]' : 'border-cyan-400'}`} />
-
-                    {/* Center Crosshair */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className={`w-2 h-2 rounded-full border ${isFocusLocked ? 'border-[#64dfdf] bg-[#64dfdf]' : 'border-cyan-400/40'}`} />
-                    </div>
-
-                    {/* Focus Status Tag */}
-                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                      <span className={`text-[9px] camera-font font-bold px-1.5 py-0.5 rounded ${isFocusLocked ? 'bg-[#64dfdf] text-black' : isHalfPressed ? 'bg-cyan-950 text-cyan-300 border border-cyan-400' : 'text-cyan-400/60'}`}>
-                        {isFocusLocked ? 'AF-LOCKED' : isHalfPressed ? 'AF-HUNTING...' : 'AF-C'}
-                      </span>
-                    </div>
-                  </div>
+                
                 )}
               </div>
 
