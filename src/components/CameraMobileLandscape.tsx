@@ -666,8 +666,6 @@ export function CameraMenuLandscape({ isOpen, onClose, onNavigate, onSwitchToPor
                 onClick={triggerFocus}
               >
                 {/* Dynamic Counter-Rotating Gyro Horizon Level Line */}
-                
-                )}
               </div>
 
               {/* ---------------- HUD: BOTTOM TELEMETRY BAR (Clean & Unscrambled) ---------------- */}
