@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rajans Photography | Speculo '26 </title>
+    <title>Rajans Photography | Speculo '26</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -138,7 +138,9 @@
             pointer-events: none !important;
         }
 
-        /* Fixed WebGL Canvas Stacking */
+        /* ============================================================
+           FIXED WEBGL LAYERS
+        ============================================================ */
         .fixed-canvas-container {
             position: fixed;
             inset: 0;
@@ -181,22 +183,20 @@
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
-            will-change: transform, opacity;
+            will-change: transform, opacity, filter;
             contain: strict;
+            transition: filter 0.35s ease;
         }
 
         /* Dedicated GPU-accelerated backdrop veil for cinematic gallery transition */
         #galleryBackdropVeil {
             position: fixed;
             inset: 0;
-            z-index: 14;
+            z-index: 12;
             pointer-events: none;
-            background: rgba(2, 5, 8, 0.94);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: transparent;
             opacity: 0;
             will-change: opacity;
-            transition: opacity 0.3s ease-out;
         }
 
         /* Fixed Action Buttons - Stays pinned above background, passes under Executive Committee */
@@ -222,7 +222,7 @@
             }
         }
 
-        /* Mobile Layout Refinements */
+        /* Force the About / Sri Lanka cards to sit dead-center on phones */
         @media (max-width: 767px) {
             #textSection1, #textSection2 {
                 justify-content: center !important;
@@ -231,21 +231,24 @@
                 margin-left: auto !important;
                 margin-right: auto !important;
                 text-align: center !important;
+                width: 100% !important;
             }
             #card1 h2, #card2 h2 {
                 text-align: center !important;
+                width: 100% !important;
             }
             #animatedText1, #animatedText2 {
                 text-align: justify !important;
                 text-justify: inter-word !important;
                 text-align-last: center !important;
+                width: 100% !important;
             }
             #galleryDotsContainer, nav[aria-label="Gallery Pagination"] {
                 display: none !important;
             }
         }
 
-        /* Executive Committee & Footer Stacking */
+        /* Solid Cinematic Executive Committee & Footer Flow */
         .committee-locked {
             display: none !important;
         }
@@ -380,51 +383,6 @@
             transform: translateY(-4px);
         }
 
-        /* Maroon & Cyan Dynamic Hover Line (Plays Once Per Hover) */
-        .maroon-cyan-sweep {
-            position: relative;
-            display: inline-block;
-            overflow: hidden;
-            vertical-align: bottom;
-        }
-
-        .maroon-cyan-sweep::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -130%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(123, 17, 19, 0.85) 30%,
-                rgba(100, 223, 223, 0.95) 70%,
-                transparent 100%
-            );
-            transform: skewX(-25deg);
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        .cinematic-glass-card:hover .maroon-cyan-sweep::before {
-            animation: sweepOnce 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-
-        @keyframes sweepOnce {
-            0% {
-                left: -130%;
-                opacity: 0;
-            }
-            30% {
-                opacity: 1;
-            }
-            100% {
-                left: 140%;
-                opacity: 0;
-            }
-        }
-
         .word-span {
             display: inline-block;
             opacity: 0;
@@ -447,11 +405,11 @@
 
         /* Liquid Glass Controls & Indicators */
         .liquid-glass {
-            background: rgba(4, 14, 24, 0.75);
+            background: rgba(4, 14, 24, 0.60);
             backdrop-filter: blur(20px) saturate(190%);
             -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(100, 223, 223, 0.35);
-            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(100, 223, 223, 0.28);
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -507,17 +465,17 @@
             animation: pulse-bg 1.8s ease-in-out infinite;
         }
 
-        /* Fullscreen Cinematic Gallery Overlay */
+        /* Fixed Fullscreen Cinematic Gallery Overlay - Frameless, Pure Photo Continuity */
         #galleryOverlay {
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 18;
+            z-index: 16;
             pointer-events: none;
             opacity: 0;
             overflow: hidden;
-            will-change: opacity, transform;
+            will-change: opacity;
             background: transparent;
         }
 
@@ -529,6 +487,7 @@
             will-change: transform;
         }
 
+        /* Slide Container - Borderless Fullscreen */
         .slide-container {
             width: 100vw;
             height: 100vh;
@@ -539,21 +498,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            padding: 2vh 4vw;
-        }
-
-        .slide-img-wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px -15px rgba(0,0,0,0.9), 0 0 40px rgba(100, 223, 223, 0.15);
-            border: 1px solid rgba(100, 223, 223, 0.22);
-            background: #040d15;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         .slide-img {
@@ -561,15 +511,59 @@
             height: 100%;
             object-fit: cover;
             pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.4s ease;
             will-change: transform;
             image-rendering: -webkit-optimize-contrast;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
 
-        .slide-container:hover .slide-img {
-            transform: scale(1.03);
+        /* Connection by blur in the middle between adjacent fullscreen photos */
+        .slide-blur-connector-left {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 120px;
+            z-index: 15;
+            pointer-events: none;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .slide-blur-connector-right {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            z-index: 15;
+            pointer-events: none;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        /* Seam blur bridge in the middle connecting slides smoothly */
+        .slide-seam-bridge {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: -75px;
+            width: 150px;
+            z-index: 18;
+            pointer-events: none;
+            backdrop-filter: blur(34px);
+            -webkit-backdrop-filter: blur(34px);
+            mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 40%, rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 40%, rgba(0, 0, 0, 0) 100%);
         }
 
         /* Custom Scrollbar */
@@ -589,7 +583,7 @@
         <canvas id="bgScannerCanvas"></canvas>
     </div>
 
-    <!-- WebGL Rotating Logo Layer -->
+    <!-- Pinned Logo Warp Canvas -->
     <canvas id="logoWarpCanvas" aria-hidden="true"></canvas>
 
     <!-- Pinned Returning User Upload Shortcut Root -->
@@ -616,36 +610,28 @@
             </div>
         </section>
 
-     <!-- Legacy of Visual Storytelling Section -->
+        <!-- Legacy Section -->
         <section class="scroll-section justify-center lg:justify-end px-4 sm:px-8 md:px-16 lg:px-24" id="textSection1">
             <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
-                <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
-                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider mb-1">LEGACY OF</span>
-                    <span class="maroon-cyan-sweep block w-full">
-                        <svg class="w-full h-auto block" viewBox="0 0 380 34" preserveAspectRatio="xMinYMid meet" aria-label="RAJANS PHOTOGRAPHY">
-                            <text x="0" y="27" fill="#ffffff" font-family="Montserrat, sans-serif" font-weight="400" font-size="28" letter-spacing="2">RAJANS PHOTOGRAPHY</text>
-                        </svg>
-                    </span>
+                <h2 class="text-2xl sm:text-3xl mb-4 text-white text-center lg:text-left leading-snug uppercase tracking-wider">
+                    <span class="font-bold">LEGACY OF</span><br>
+                    <span class="font-normal">RAJANS PHOTOGRAPHY</span>
                 </h2>
                 <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText1">Founded in 2003, the Photographic Society of Dharmaraja College has been dedicated to promoting photography among young enthusiasts through national events, competitions, livestreams, workshops, and educational activities, helping students develop their creative vision and technical mastery.</p>
             </div>
         </section>
 
-        <!-- Dedicated Gallery Trigger Scroll Space -->
+        <!-- Gallery Scroll Distance Trigger -->
         <section id="galleryTriggerSection" aria-label="Cinematic Gallery Scroll Distance"></section>
 
-        <!-- Sri Lanka’s Premier All-Island Photography Competition Section -->
+        <!-- Competition Section -->
         <section class="scroll-section justify-center lg:justify-start px-4 sm:px-8 md:px-16 lg:px-24" id="textSection2">
             <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:mr-auto lg:ml-0" id="card2">
-                <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
-                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider mb-1">SRI LANKA'S PREMIER</span>
-                    <span class="maroon-cyan-sweep block w-full">
-                        <svg class="w-full h-auto block" viewBox="0 0 540 30" preserveAspectRatio="xMinYMid meet" aria-label="ALL-ISLAND PHOTOGRAPHY COMPETITION">
-                            <text x="0" y="24" fill="#ffffff" font-family="Montserrat, sans-serif" font-weight="400" font-size="22" letter-spacing="1">ALL-ISLAND PHOTOGRAPHY COMPETITION</text>
-                        </svg>
-                    </span>
+                <h2 class="mb-4 text-white text-center lg:text-left leading-tight uppercase tracking-wider w-full [text-wrap:balance]">
+                    <span class="font-bold block text-[clamp(1.2rem,4.4vw,2.5rem)] tracking-wide">SRI LANKA'S PREMIER</span>
+                    <span class="font-normal block text-[clamp(0.72rem,2.75vw,1.65rem)] tracking-wider mt-1">ALL-ISLAND PHOTOGRAPHY COMPETITION</span>
                 </h2>
-                <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText2">Speculo is the society’s signature all-island photography competition and exhibition, providing Sri Lankan photographers with a powerful platform. The event features hands-on masterclasses by renowned photographers and a live photography photowalk capturing the historic beauty of Sri Lanka.</p>
+                <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify w-full [text-wrap:pretty]" id="animatedText2">Speculo is the society’s signature all-island photography competition and exhibition, providing Sri Lankan photographers with a powerful platform. The event features hands-on masterclasses by renowned photographers and a live photography photowalk capturing the historic beauty of Sri Lanka.</p>
             </div>
         </section>
 
@@ -668,7 +654,7 @@
                     <div class="flex items-center space-x-3">
                         <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/Logo%20White.png" alt="Rajans Photography Logo" class="h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(100,223,223,0.6)] logo-hover-animate">
                         <div>
-                            <span class="block font-bold tracking-[0.18em] text-white text-base">RAJANS <b>PHOTOGRAPHY</b></span>
+                            <span class="block font-bold tracking-[0.18em] text-white text-base">RAJANS <B>PHOTOGRAPHY</B></span>
                             <span class="block text-[11px] tracking-[0.15em] text-brand-teal font-medium uppercase">Photographic Society of Dharmaraja College</span>
                         </div>
                     </div>
@@ -704,16 +690,10 @@
         </footer>
     </div>
 
-    <!-- Fixed Fullscreen Gallery Overlay -->
+    <!-- Fixed Fullscreen Gallery Overlay (Text Hint Removed, Frameless Fullscreen Seamless Photos) -->
     <div id="galleryOverlay" aria-hidden="true">
-        <div id="galleryDragHint" class="pointer-events-none fixed inset-x-0 bottom-20 z-30 flex flex-col items-center justify-center transition-opacity duration-700 opacity-0" style="display: none;">
-            <div class="liquid-glass px-5 py-2.5 rounded-full flex items-center space-x-3 text-white/90 text-xs tracking-wider uppercase shadow-2xl border border-[#64dfdf]/40">
-                <span class="inline-block w-2 h-2 rounded-full bg-[#64dfdf] animate-ping"></span>
-                <span>Scroll to Traverse Gallery • Click Photograph to Enlarge</span>
-            </div>
-        </div>
         <nav class="fixed bottom-6 inset-x-0 z-30 flex justify-center pointer-events-none" aria-label="Gallery Pagination">
-            <div id="galleryDotsContainer" class="liquid-glass px-3.5 py-1.5 rounded-full flex items-center space-x-2 pointer-events-auto opacity-80 hover:opacity-100 transition-opacity duration-500"></div>
+            <div id="galleryDotsContainer" class="liquid-glass px-3.5 py-1.5 rounded-full flex items-center space-x-2 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity duration-500"></div>
         </nav>
         <main id="galleryTrack"></main>
     </div>
@@ -741,7 +721,6 @@
             const galleryOverlay = document.getElementById('galleryOverlay');
             const galleryTrack = document.getElementById('galleryTrack');
             const galleryDotsContainer = document.getElementById('galleryDotsContainer');
-            const galleryDragHint = document.getElementById('galleryDragHint');
             const galleryTriggerSection = document.getElementById('galleryTriggerSection');
 
             const lightbox = document.getElementById('lightbox');
@@ -788,12 +767,9 @@
                 slide.className = 'slide-container';
                 slide.setAttribute('data-index', idx);
 
-                const wrapper = document.createElement('div');
-                wrapper.className = 'slide-img-wrapper';
-
                 const skeleton = document.createElement('div');
                 skeleton.className = 'absolute inset-0 skeleton-loader';
-                wrapper.appendChild(skeleton);
+                slide.appendChild(skeleton);
 
                 const img = document.createElement('img');
                 img.alt = `Speculo Photography Exhibit ${idx + 1}`;
@@ -812,8 +788,23 @@
                     handleImageReveal();
                 };
                 img.src = src;
-                wrapper.appendChild(img);
-                slide.appendChild(wrapper);
+                slide.appendChild(img);
+
+                // Add seamless blur connection in the middle between adjacent photos
+                if (idx > 0) {
+                    const blurLeft = document.createElement('div');
+                    blurLeft.className = 'slide-blur-connector-left';
+                    slide.appendChild(blurLeft);
+                }
+                if (idx < rawImages.length - 1) {
+                    const blurRight = document.createElement('div');
+                    blurRight.className = 'slide-blur-connector-right';
+                    slide.appendChild(blurRight);
+
+                    const seamBridge = document.createElement('div');
+                    seamBridge.className = 'slide-seam-bridge';
+                    slide.appendChild(seamBridge);
+                }
 
                 slide.addEventListener('click', () => {
                     openLightbox(img.src, `Speculo Photography Exhibit ${idx + 1}`);
@@ -868,6 +859,7 @@
             let hasBaseImage = false;
             let hasLensImage = false;
             let currentAngle = 0;
+            const rotationSpeed = 0.0035;
             let lensCenter = { x: 0, y: 0 };
 
             let isHovered = false;
@@ -919,6 +911,8 @@
             let mouseClientY = window.innerHeight / 2;
             let currentSpotX = mouseClientX;
             let currentSpotY = mouseClientY;
+            let mouseMoveTimeout;
+
             let baseLoadAttempts = 0;
 
             logoBase.onload = () => {
@@ -1146,7 +1140,7 @@
                 vec2 split = (sLen > 0.00001 ? sDir / sLen : vec2(0.7071)) * uRefraction * 0.16 * (0.35 + lens * 1.65);
                 vec4 base = sampleText(d);
                 fragColor = vec4(vec3(sampleText(d + split).r, base.g, sampleText(d - split).b) + lens * base.a * 0.055, max(max(sampleText(d + split).a, base.a), sampleText(d - split).a));
-            } `;
+            }`;
 
             function initLogoWarpEffect() {
                 try {
@@ -1159,8 +1153,8 @@
                     logoGl.useProgram(logoProgram);
 
                     const positionsUV = new Float32Array([
-                        -1, -1, 0, 0,   1, -1, 1, 0,  -1, 1, 0, 1,
-                        -1,  1, 0, 1,   1, -1, 1, 0,   1, 1, 1, 1
+                        -1, -1, 0, 0,  1, -1, 1, 0,  -1, 1, 0, 1,
+                        -1,  1, 0, 1,  1, -1, 1, 0,   1, 1, 1, 1
                     ]);
 
                     const vbo = logoGl.createBuffer();
@@ -1262,8 +1256,10 @@
                 const currentLensCenterX = drawX + lensCenter.x * scaleX;
                 const currentLensCenterY = drawY + lensCenter.y * scaleY;
 
+                // Draw Base Logo
                 logoCtx.drawImage(logoBase, drawX, drawY, drawW, drawH);
 
+                // Draw Rotating Lens
                 if (hasLensImage && logoLens.naturalWidth > 0) {
                     const activeRotSpeed = isHovered ? 0.012 : 0.0035;
                     currentAngle += activeRotSpeed;
@@ -1275,6 +1271,7 @@
                     logoCtx.restore();
                 }
 
+                // Draw Dynamic Interactive Shine
                 if (isHovered || shineAlpha > 0.01) {
                     if (isHovered) {
                         shineAlpha = Math.min(1, shineAlpha + 0.12);
@@ -1366,8 +1363,8 @@
 
                 const galleryProgress = Math.max(0, Math.min(1, (scrollPosition - galleryStart) / Math.max(1, galleryEnd - galleryStart)));
 
-                const entry = 0.04;
-                const exit = 0.96;
+                const entry = 0.06;
+                const exit = 0.94;
                 let rawOpacity = 0;
 
                 if (galleryProgress <= entry) {
@@ -1380,34 +1377,24 @@
                     rawOpacity = 1 - p;
                 }
 
-                const overlayOpacity = Math.max(0, Math.min(1, rawOpacity));
+                const overlayOpacity = Math.max(0, Math.min(0.95, rawOpacity));
                 const isActiveThreshold = galleryProgress > 0 && galleryProgress < 1 && (gRect.top < vh && gRect.bottom > 0);
 
-                if (isActiveThreshold && overlayOpacity > 0.01) {
+                if (isActiveThreshold) {
                     galleryOverlay.style.display = 'block';
-                    galleryOverlay.style.opacity = overlayOpacity.toFixed(3);
-                    galleryOverlay.style.pointerEvents = overlayOpacity > 0.1 ? 'auto' : 'none';
-
+                    galleryOverlay.style.opacity = Math.max(0.01, overlayOpacity).toFixed(3);
+                    galleryOverlay.style.pointerEvents = overlayOpacity > 0.05 ? 'auto' : 'none';
                     if (galleryBackdropVeil) {
                         galleryBackdropVeil.style.display = 'block';
-                        galleryBackdropVeil.style.opacity = (overlayOpacity * 0.94).toFixed(3);
-                    }
-                    if (galleryDragHint) {
-                        galleryDragHint.style.display = 'flex';
-                        galleryDragHint.style.opacity = overlayOpacity > 0.35 ? '1' : '0';
+                        galleryBackdropVeil.style.opacity = overlayOpacity.toFixed(3);
                     }
                 } else {
                     galleryOverlay.style.display = 'none';
                     galleryOverlay.style.opacity = '0';
                     galleryOverlay.style.pointerEvents = 'none';
-
                     if (galleryBackdropVeil) {
                         galleryBackdropVeil.style.display = 'none';
                         galleryBackdropVeil.style.opacity = '0';
-                    }
-                    if (galleryDragHint) {
-                        galleryDragHint.style.display = 'none';
-                        galleryDragHint.style.opacity = '0';
                     }
                 }
 
@@ -1472,11 +1459,24 @@
                 const commRect = (!isCommLocked && committeeSection) ? committeeSection.getBoundingClientRect() : null;
 
                 if (logoWarpCanvas) {
+                    let baseOpacity = 1.0;
+                    if (overlayOpacity > 0.01) {
+                        // Smoothly drop to 30% opacity (0.30) when over the photos
+                        baseOpacity = 1.0 - (0.90 * overlayOpacity);
+                        const glowRadius1 = (24 * overlayOpacity).toFixed(1);
+                        const glowRadius2 = (48 * overlayOpacity).toFixed(1);
+                        const glowAlpha1 = (0.85 * overlayOpacity).toFixed(2);
+                        const glowAlpha2 = (0.50 * overlayOpacity).toFixed(2);
+                        logoWarpCanvas.style.filter = `drop-shadow(0 0 ${glowRadius1}px rgba(100, 223, 223, ${glowAlpha1})) drop-shadow(0 0 ${glowRadius2}px rgba(72, 191, 227, ${glowAlpha2}))`;
+                    } else {
+                        logoWarpCanvas.style.filter = 'none';
+                    }
+
                     if (commRect && commRect.top < vh) {
                         const commFade = Math.max(0, Math.min(1, commRect.top / (vh * 0.65)));
-                        logoWarpCanvas.style.opacity = commFade.toFixed(3);
+                        logoWarpCanvas.style.opacity = (baseOpacity * commFade).toFixed(3);
                     } else {
-                        logoWarpCanvas.style.opacity = '1';
+                        logoWarpCanvas.style.opacity = baseOpacity.toFixed(3);
                     }
                 }
 
@@ -1596,16 +1596,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const THEMES_DATA = [
-          { id: "colour", title: "COLOUR", number: "01", desc: "Vibrant and colorful photography that captures the beauty of our world in full spectrum.", ambientColor: "#030814", glowColor: "rgba(100, 223, 223, 0.45)", accent: "#64dfdf" },
-          { id: "mono", title: "MONO", number: "02", desc: "Black and white photography that tells powerful stories through contrast, shadow, and texture.", ambientColor: "#050505", glowColor: "rgba(220, 220, 230, 0.4)", accent: "#e2e8f0" },
-          { id: "mobile", title: "MOBILE", number: "03", desc: "Stunning images captured with mobile devices, proving great photography is in the visionary eye.", ambientColor: "#100602", glowColor: "rgba(255, 120, 40, 0.45)", accent: "#fb923c" },
-          { id: "wild", title: "WILD", number: "04", desc: "Photography that showcases animals in their natural habitat and the untamed beauty of wildlife.", ambientColor: "#020d06", glowColor: "rgba(40, 190, 100, 0.45)", accent: "#34d399" },
-          { id: "macro", title: "MACRO", number: "05", desc: "Extreme close-up photography capturing miniature details invisible to the naked human eye.", ambientColor: "#060910", glowColor: "rgba(160, 190, 240, 0.45)", accent: "#93c5fd" },
-          { id: "street", title: "STREET", number: "06", desc: "Authentic and candid moments from everyday life through the spontaneous lens of the street.", ambientColor: "#0e0303", glowColor: "rgba(240, 80, 80, 0.45)", accent: "#f87171" },
-          { id: "architecture", title: "ARCHITECTURE", number: "07", desc: "Creative images capturing the geometric craft of buildings, cityscapes, and man-made structures.", ambientColor: "#0f0e0c", glowColor: "rgba(240, 210, 170, 0.45)", accent: "#fde68a" }
-        ];
-
         const EXECUTIVES_DESKTOP = [
           { title: "ASST TREASURER", name: "DHARANA PILAPITIYA" },
           { title: "VICE PRESIDENT", name: "SASIRU BANDARA" },
@@ -1670,9 +1660,9 @@
           return (
             <a 
               href="Submissions.html" 
-              id="speculoUploadShortcut"
-              aria-label="Direct Upload Entry Shortcut"
-              title="Upload Entry"
+              id="speculoUploadShortcut" 
+              aria-label="Direct Upload Entry Shortcut" 
+              title="Upload Entry" 
               className="fixed top-6 right-6 sm:top-8 sm:right-10 z-40 group inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#03080d]/85 backdrop-blur-xl border border-[#64dfdf]/60 text-[#64dfdf] shadow-[0_0_20px_rgba(100,223,223,0.3)] hover:shadow-[0_0_35px_rgba(100,223,223,0.85)] hover:bg-[#64dfdf] hover:text-[#020508] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer no-underline"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2" className="transition-transform duration-300 group-hover:-translate-y-0.5">
@@ -1757,6 +1747,7 @@
           useEffect(() => {
             const checkVisibility = () => {
               const text2 = document.getElementById('textSection2');
+              const finalSec = document.getElementById('finalSection');
               const committeeSec = document.getElementById('committeeSection');
               const vh = window.innerHeight;
 
@@ -1942,7 +1933,6 @@
         if (committeeRootEl) ReactDOM.createRoot(committeeRootEl).render(<CommitteeApp />);
     </script>
 
-    <!-- Navigation Hash Router Engine -->
     <script>
       (function() {
         function routeCurrentHash() {
