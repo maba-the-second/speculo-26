@@ -138,59 +138,54 @@
             pointer-events: none !important;
         }
 
-        /* ============================================================
-   FIXED WEBGL LAYERS
-   Background and logo use separate stacking contexts.
-   The logo is intentionally above the scroll content but below
-   the gallery, HUD and committee layers.
-============================================================ */
-.fixed-canvas-container {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100dvh;
-    min-width: 1px;
-    min-height: 1px;
-    pointer-events: none;
-    z-index: 1;
-    overflow: hidden;
-    isolation: isolate;
-    contain: layout paint size;
-}
+        /* Fixed WebGL Canvas Stacking */
+        .fixed-canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            min-width: 1px;
+            min-height: 1px;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+            isolation: isolate;
+            contain: layout paint size;
+        }
 
-#bgScannerCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    min-width: 1px;
-    min-height: 1px;
-    display: block;
-    pointer-events: none;
-    z-index: 1;
-}
+        #bgScannerCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            min-width: 1px;
+            min-height: 1px;
+            display: block;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-#logoWarpCanvas {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100dvh;
-    min-width: 1px;
-    min-height: 1px;
-    display: block;
-    pointer-events: none;
-    z-index: 20;
-    mix-blend-mode: screen;
-    opacity: 1;
-    visibility: visible;
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    will-change: transform, opacity;
-    contain: strict;
-}
+        #logoWarpCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            min-width: 1px;
+            min-height: 1px;
+            display: block;
+            pointer-events: none;
+            z-index: 20;
+            mix-blend-mode: screen;
+            opacity: 1;
+            visibility: visible;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            will-change: transform, opacity;
+            contain: strict;
+        }
 
-/* Dedicated GPU-accelerated backdrop veil for cinematic gallery transition */
+        /* Dedicated GPU-accelerated backdrop veil for cinematic gallery transition */
         #galleryBackdropVeil {
             position: fixed;
             inset: 0;
@@ -224,8 +219,7 @@
             }
         }
 
-        /* Force the About / Sri Lanka cards to sit dead-center on phones,
-           center the titles, and center-justify paragraphs on mobile. */
+        /* Force cards to center on mobile */
         @media (max-width: 767px) {
             #textSection1, #textSection2 {
                 justify-content: center !important;
@@ -383,6 +377,51 @@
             transform: translateY(-4px);
         }
 
+        /* Dynamic Maroon & Cyan Sweep On Hover (Plays Once) */
+        .maroon-cyan-sweep {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: bottom;
+        }
+
+        .maroon-cyan-sweep::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -130%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(123, 17, 19, 0.85) 30%,
+                rgba(100, 223, 223, 0.95) 70%,
+                transparent 100%
+            );
+            transform: skewX(-25deg);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .cinematic-glass-card:hover .maroon-cyan-sweep::before {
+            animation: sweepOnce 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes sweepOnce {
+            0% {
+                left: -130%;
+                opacity: 0;
+            }
+            30% {
+                opacity: 1;
+            }
+            100% {
+                left: 140%;
+                opacity: 0;
+            }
+        }
+
         .word-span {
             display: inline-block;
             opacity: 0;
@@ -465,16 +504,6 @@
             animation: pulse-bg 1.8s ease-in-out infinite;
         }
 
-        /* Animated Gesture Hint */
-        @keyframes hint-swipe {
-            0% { transform: translateX(-8px); opacity: 0.4; }
-            50% { transform: translateX(8px); opacity: 1; }
-            100% { transform: translateX(-8px); opacity: 0.4; }
-        }
-        .animate-hint-swipe {
-            animation: hint-swipe 2s ease-in-out infinite;
-        }
-
         /* Fixed Fullscreen Cinematic Gallery Overlay */
         #galleryOverlay {
             position: fixed;
@@ -526,44 +555,6 @@
         ::-webkit-scrollbar-track { background: #020508; }
         ::-webkit-scrollbar-thumb { background: rgba(32, 82, 107, 0.8); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #3AAFA9; }
-
-        /* Locked Cinematic Navigation HUD */
-        .speculo-fixed-actions {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 40;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-            max-width: 92vw;
-            will-change: transform, opacity;
-        }
-
-        @media (max-width: 640px) {
-            .speculo-fixed-actions {
-                bottom: 22px;
-                width: 100%;
-                padding: 0 12px;
-            }
-        }
-
-        /* Committee & Footer Boundary */
-        #committeeSection {
-            background-color: #020508;
-            position: relative;
-            z-index: 100;
-            isolation: isolate;
-        }
-
-        footer {
-            background-color: #020508;
-            position: relative;
-            z-index: 100;
-            isolation: isolate;
-        }
     </style>
 </head>
 <body class="bg-[#020508] text-white w-full min-h-screen m-0 p-0 select-none overflow-x-hidden">
@@ -576,9 +567,7 @@
         <canvas id="bgScannerCanvas"></canvas>
     </div>
 
-    <!-- Logo is deliberately outside the background stacking context.
-         This fixes the original z-index bug where the logo was trapped
-         behind the scroll content. -->
+    <!-- WebGL Rotating Logo Layer -->
     <canvas id="logoWarpCanvas" aria-hidden="true"></canvas>
 
     <!-- Pinned Returning User Upload Shortcut Root -->
@@ -605,23 +594,26 @@
             </div>
         </section>
 
-    <section class="scroll-section justify-center lg:justify-end px-4 sm:px-8 md:px-16 lg:px-24" id="textSection1">
-            <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
-                <h2 class="text-2xl sm:text-3xl mb-4 text-white text-center lg:text-left leading-snug uppercase tracking-wider">
-                    <span class="font-bold">LEGACY OF</span><br>
-                    <span class="font-normal">RAJANS PHOTOGRAPHY</span>
+        <!-- Legacy of Visual Storytelling Section -->
+        <section class="scroll-section justify-center lg:justify-end px-4 sm:px-8 md:px-16 lg:px-24" id="textSection1">
+            <div class="cinematic-glass-card @container max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
+                <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
+                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider">LEGACY OF</span>
+                    <span class="maroon-cyan-sweep font-normal whitespace-nowrap block tracking-normal sm:tracking-wide text-[clamp(0.9rem,8.5cqw,2.2rem)]">RAJANS PHOTOGRAPHY</span>
                 </h2>
                 <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText1">Founded in 2003, the Photographic Society of Dharmaraja College has been dedicated to promoting photography among young enthusiasts through national events, competitions, livestreams, workshops, and educational activities, helping students develop their creative vision and technical mastery.</p>
             </div>
         </section>
 
+        <!-- Dedicated Gallery Trigger Scroll Space -->
         <section id="galleryTriggerSection" aria-label="Cinematic Gallery Scroll Distance"></section>
 
-       <section class="scroll-section justify-center lg:justify-start px-4 sm:px-8 md:px-16 lg:px-24" id="textSection2">
+        <!-- Sri Lanka’s Premier All-Island Photography Competition Section -->
+        <section class="scroll-section justify-center lg:justify-start px-4 sm:px-8 md:px-16 lg:px-24" id="textSection2">
             <div class="cinematic-glass-card @container max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:mr-auto lg:ml-0" id="card2">
                 <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
                     <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider">SRI LANKA'S PREMIER</span>
-                    <span class="font-normal whitespace-nowrap block tracking-normal sm:tracking-wide text-[clamp(0.75rem,5.2cqw,1.55rem)]">ALL-ISLAND PHOTOGRAPHY COMPETITION</span>
+                    <span class="maroon-cyan-sweep font-normal whitespace-nowrap block tracking-normal sm:tracking-wide text-[clamp(0.75rem,5.2cqw,1.55rem)]">ALL-ISLAND PHOTOGRAPHY COMPETITION</span>
                 </h2>
                 <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText2">Speculo is the society’s signature all-island photography competition and exhibition, providing Sri Lankan photographers with a powerful platform. The event features hands-on masterclasses by renowned photographers and a live photography photowalk capturing the historic beauty of Sri Lanka.</p>
             </div>
@@ -646,7 +638,7 @@
                     <div class="flex items-center space-x-3">
                         <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/Logo%20White.png" alt="Rajans Photography Logo" class="h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(100,223,223,0.6)] logo-hover-animate">
                         <div>
-                            <span class="block font-bold tracking-[0.18em] text-white text-base">RAJANS <B>PHOTOGRAPHY</B></span>
+                            <span class="block font-bold tracking-[0.18em] text-white text-base">RAJANS <b>PHOTOGRAPHY</b></span>
                             <span class="block text-[11px] tracking-[0.15em] text-brand-teal font-medium uppercase">Photographic Society of Dharmaraja College</span>
                         </div>
                     </div>
@@ -680,7 +672,7 @@
                 <div class="text-brand-teal/80 mt-2 sm:mt-0">SPECULO '26 EXHIBITION</div>
             </div>
         </footer>
- 
+    </div>
 
     <!-- Fixed Fullscreen Gallery Overlay -->
     <div id="galleryOverlay" aria-hidden="true">
@@ -841,7 +833,6 @@
             let hasBaseImage = false;
             let hasLensImage = false;
             let currentAngle = 0;
-            const rotationSpeed = 0.0035;
             let lensCenter = { x: 0, y: 0 };
 
             let isHovered = false;
@@ -893,8 +884,6 @@
             let mouseClientY = window.innerHeight / 2;
             let currentSpotX = mouseClientX;
             let currentSpotY = mouseClientY;
-            let mouseMoveTimeout;
-
             let baseLoadAttempts = 0;
 
             logoBase.onload = () => {
@@ -902,8 +891,6 @@
             };
 
             logoBase.onerror = () => {
-                /* Never leave the WebGL logo empty because of a remote
-                   image/CORS failure. Try the bundled asset first. */
                 if (baseLoadAttempts === 0) {
                     baseLoadAttempts++;
                     logoBase.src = "logo-white.png";
@@ -919,8 +906,6 @@
             };
 
             logoLens.onerror = () => {
-                /* The lens is decorative. The main Speculo logo must
-                   render even if the lens asset is unavailable. */
                 hasLensImage = false;
                 lensCenter = {
                     x: logoBase.naturalWidth / 2 || 100,
@@ -1139,8 +1124,8 @@
                     logoGl.useProgram(logoProgram);
 
                     const positionsUV = new Float32Array([
-                        -1, -1, 0, 0,  1, -1, 1, 0,  -1, 1, 0, 1,
-                        -1,  1, 0, 1,  1, -1, 1, 0,   1, 1, 1, 1
+                        -1, -1, 0, 0,   1, -1, 1, 0,  -1, 1, 0, 1,
+                        -1,  1, 0, 1,   1, -1, 1, 0,   1, 1, 1, 1
                     ]);
 
                     const vbo = logoGl.createBuffer();
@@ -1214,8 +1199,6 @@
                 if (!hasBaseImage || !logoBase.naturalWidth) return;
 
                 const isMobile = window.innerWidth < 768;
-                // Width-based responsive scale that expands smoothly on mobile
-                // while strictly maintaining desktop scaling.
                 const vw = window.innerWidth;
                 const scaleT = Math.min(1, Math.max(0, (vw - 320) / (1024 - 320)));
                 const widthResponsiveFactor = isMobile ? 0.94 : (0.62 + scaleT * (0.95 - 0.62));
@@ -1223,7 +1206,6 @@
                 const natW = logoBase.naturalWidth;
                 const natH = logoBase.naturalHeight;
 
-                // Enforce safety limits so the logo never touches or overflows canvas borders
                 const maxSafeWidthRatio = isMobile ? 0.92 : 0.88;
                 const maxSafeHeightRatio = isMobile ? 0.85 : 0.82;
                 const scale = Math.min(
@@ -1234,7 +1216,6 @@
                 );
                 const drawW = natW * scale, drawH = natH * scale;
 
-                // Clamp drawX and drawY with a dedicated edge margin
                 const sideMargin = isMobile ? w * 0.04 : w * 0.035;
                 const rawDrawX = (w * logoPositionState.currentX) - (drawW / 2);
                 const rawDrawY = (h * logoPositionState.currentY) - (drawH / 2);
@@ -1246,10 +1227,8 @@
                 const currentLensCenterX = drawX + lensCenter.x * scaleX;
                 const currentLensCenterY = drawY + lensCenter.y * scaleY;
 
-                // Draw Base
                 logoCtx.drawImage(logoBase, drawX, drawY, drawW, drawH);
 
-                // Draw Rotating Lens only when the decorative asset loaded.
                 if (hasLensImage && logoLens.naturalWidth > 0) {
                     const activeRotSpeed = isHovered ? 0.012 : 0.0035;
                     currentAngle += activeRotSpeed;
@@ -1261,7 +1240,6 @@
                     logoCtx.restore();
                 }
 
-                // Draw Dynamic Interactive Shine
                 if (isHovered || shineAlpha > 0.01) {
                     if (isHovered) {
                         shineAlpha = Math.min(1, shineAlpha + 0.12);
@@ -1356,19 +1334,15 @@
                 const entry = 0.06;
                 const exit = 0.94;
                 let rawOpacity = 0;
-                let overlayScale = 1;
 
                 if (galleryProgress <= entry) {
                     const p = Math.max(0, Math.min(1, galleryProgress / entry));
                     rawOpacity = p;
-                    overlayScale = 1.03 - (p * 0.03);
                 } else if (galleryProgress < exit) {
                     rawOpacity = 1;
-                    overlayScale = 1;
                 } else {
                     const p = Math.max(0, Math.min(1, (galleryProgress - exit) / (1 - exit)));
                     rawOpacity = 1 - p;
-                    overlayScale = 1;
                 }
 
                 const overlayOpacity = Math.max(0, Math.min(0.95, rawOpacity));
@@ -1525,16 +1499,6 @@
             const updatePointer = (clientX, clientY) => {
                 mouseClientX = clientX;
                 mouseClientY = clientY;
-                const cLight = document.getElementById('cursorLight');
-                if (cLight) {
-                    cLight.classList.remove('opacity-0');
-                    cLight.classList.add('opacity-100');
-
-                    clearTimeout(mouseMoveTimeout);
-                    mouseMoveTimeout = setTimeout(() => {
-                        if (!isHovered) cLight.classList.remove('opacity-100');
-                    }, 2000);
-                }
 
                 if (appContainer) {
                     const rect = appContainer.getBoundingClientRect();
@@ -1554,8 +1518,6 @@
             window.addEventListener('mouseleave', () => {
                 isHovered = false;
                 pointer.activeTarget = 0;
-                const cLight = document.getElementById('cursorLight');
-                if (cLight) cLight.classList.remove('opacity-100');
             });
 
             window.addEventListener('touchstart', e => {
@@ -1588,16 +1550,6 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-
-        const THEMES_DATA = [
-          { id: "colour", title: "COLOUR", number: "01", desc: "Vibrant and colorful photography that captures the beauty of our world in full spectrum.", ambientColor: "#030814", glowColor: "rgba(100, 223, 223, 0.45)", accent: "#64dfdf" },
-          { id: "mono", title: "MONO", number: "02", desc: "Black and white photography that tells powerful stories through contrast, shadow, and texture.", ambientColor: "#050505", glowColor: "rgba(220, 220, 230, 0.4)", accent: "#e2e8f0" },
-          { id: "mobile", title: "MOBILE", number: "03", desc: "Stunning images captured with mobile devices, proving great photography is in the visionary eye.", ambientColor: "#100602", glowColor: "rgba(255, 120, 40, 0.45)", accent: "#fb923c" },
-          { id: "wild", title: "WILD", number: "04", desc: "Photography that showcases animals in their natural habitat and the untamed beauty of wildlife.", ambientColor: "#020d06", glowColor: "rgba(40, 190, 100, 0.45)", accent: "#34d399" },
-          { id: "macro", title: "MACRO", number: "05", desc: "Extreme close-up photography capturing miniature details invisible to the naked human eye.", ambientColor: "#060910", glowColor: "rgba(160, 190, 240, 0.45)", accent: "#93c5fd" },
-          { id: "street", title: "STREET", number: "06", desc: "Authentic and candid moments from everyday life through the spontaneous lens of the street.", ambientColor: "#0e0303", glowColor: "rgba(240, 80, 80, 0.45)", accent: "#f87171" },
-          { id: "architecture", title: "ARCHITECTURE", number: "07", desc: "Creative images capturing the geometric craft of buildings, cityscapes, and man-made structures.", ambientColor: "#0f0e0c", glowColor: "rgba(240, 210, 170, 0.45)", accent: "#fde68a" }
-        ];
 
         const EXECUTIVES_DESKTOP = [
           { title: "ASST TREASURER", name: "DHARANA PILAPITIYA" },
@@ -1651,7 +1603,6 @@
               if (visited === 'true') {
                 setShow(true);
               } else {
-                // Set visited for future sessions
                 setTimeout(() => {
                   try { localStorage.setItem('speculo_visited', 'true'); } catch(e) {}
                 }, 3000);
@@ -1698,7 +1649,6 @@
               const rect = finalSec.getBoundingClientRect();
               const vh = window.innerHeight;
               
-              // Visible when user reaches finalSection / Explore buttons area
               if (rect.top <= vh * 0.9) {
                 setIsVisible(true);
               } else {
@@ -1752,16 +1702,13 @@
           useEffect(() => {
             const checkVisibility = () => {
               const text2 = document.getElementById('textSection2');
-              const finalSec = document.getElementById('finalSection');
               const committeeSec = document.getElementById('committeeSection');
               const vh = window.innerHeight;
 
-              // Appear after the Sri Lanka box (textSection2)
               if (text2) {
                 const rect2 = text2.getBoundingClientRect();
                 const pastSriLanka = rect2.top <= vh * 0.45;
                 
-                // Hide if scrolled deep into committee or footer
                 let underCommittee = false;
                 if (committeeSec && !committeeSec.classList.contains('committee-locked')) {
                   const commRect = committeeSec.getBoundingClientRect();
@@ -1788,7 +1735,6 @@
                 isVisible ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-6 scale-95 pointer-events-none'
               }`}
             >
-              {/* Cyn_Black EXPLORE THEMES Button */}
               <a 
                 href="themes.html" 
                 aria-label="Explore Themes - Competition Themes"
@@ -1798,7 +1744,6 @@
                 <span className="relative z-10">EXPLORE THEMES</span>
               </a>
 
-              {/* Cyn_Black SUBMIT ENTRY Button */}
               <a 
                 href="Submissions.html" 
                 aria-label="Submit Entry - Speculo Submissions"
@@ -1835,7 +1780,6 @@
 
               {view === 'summary' && (
                 <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center py-2">
-                  {/* Leaders portrait: Full visibility without face cropping on desktop */}
                   <div className="hidden md:flex lg:col-span-6 relative w-full h-[44vh] sm:h-[48vh] md:h-[54vh] items-end justify-center side-feather-mask overflow-hidden">
                     <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/1.png" alt="Executive Leaders" className="w-full h-full object-contain object-bottom origin-bottom filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.95)]" />
                   </div>
@@ -1879,7 +1823,6 @@
                     <img src="https://raw.githubusercontent.com/rajansphotography/spec/main/2.png" alt="Executive Committee Full Group" className="w-full h-full object-contain object-bottom filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]" />
                   </div>
                   <div className="w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-brand-teal/50 to-transparent my-5"></div>
-                  {/* Executive Committee List */}
                   <div className="w-[94vw] max-w-[1050px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 lg:gap-0 z-20">
                     {currentExecutives.map((exec, idx) => (
                       <div key={idx} className="exec-item relative text-center px-1 py-1.5 lg:py-0 rounded-lg lg:rounded-none bg-brand-card/30 lg:bg-transparent border border-brand-teal/10 lg:border-0">
@@ -1944,7 +1887,7 @@
         if (committeeRootEl) ReactDOM.createRoot(committeeRootEl).render(<CommitteeApp />);
     </script>
 
-    <!-- Zero-Dependency Vanilla JS Hash Router & Navigation Link Engine -->
+    <!-- Navigation Hash Router Engine -->
     <script>
       (function() {
         function routeCurrentHash() {
@@ -1975,7 +1918,6 @@
           }
         }
 
-        // Execute immediately and on future state updates
         routeCurrentHash();
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', routeCurrentHash);
@@ -1987,7 +1929,6 @@
         });
         window.addEventListener('hashchange', routeCurrentHash);
 
-        // Listen for postMessage navigation commands from CameraOS / parent frame
         window.addEventListener('message', function(evt) {
           if (evt.data && evt.data.type === 'NAVIGATE' && evt.data.targetId) {
             if (evt.data.targetId === 'committeeSection' || evt.data.targetId === 'committee' || evt.data.targetId === 'committeeRoot') {
