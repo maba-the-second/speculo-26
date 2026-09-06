@@ -189,11 +189,14 @@
         #galleryBackdropVeil {
             position: fixed;
             inset: 0;
-            z-index: 12;
+            z-index: 14;
             pointer-events: none;
-            background: transparent;
+            background: rgba(2, 5, 8, 0.94);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             opacity: 0;
             will-change: opacity;
+            transition: opacity 0.3s ease-out;
         }
 
         /* Fixed Action Buttons - Stays pinned above background, passes under Executive Committee */
@@ -219,7 +222,7 @@
             }
         }
 
-        /* Force cards to center on mobile */
+        /* Mobile Layout Refinements */
         @media (max-width: 767px) {
             #textSection1, #textSection2 {
                 justify-content: center !important;
@@ -242,7 +245,7 @@
             }
         }
 
-        /* Solid Cinematic Executive Committee & Footer Flow */
+        /* Executive Committee & Footer Stacking */
         .committee-locked {
             display: none !important;
         }
@@ -377,7 +380,7 @@
             transform: translateY(-4px);
         }
 
-        /* Dynamic Maroon & Cyan Sweep On Hover (Plays Once) */
+        /* Maroon & Cyan Dynamic Hover Line (Plays Once Per Hover) */
         .maroon-cyan-sweep {
             position: relative;
             display: inline-block;
@@ -444,11 +447,11 @@
 
         /* Liquid Glass Controls & Indicators */
         .liquid-glass {
-            background: rgba(4, 14, 24, 0.60);
+            background: rgba(4, 14, 24, 0.75);
             backdrop-filter: blur(20px) saturate(190%);
             -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(100, 223, 223, 0.28);
-            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(100, 223, 223, 0.35);
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -504,17 +507,17 @@
             animation: pulse-bg 1.8s ease-in-out infinite;
         }
 
-        /* Fixed Fullscreen Cinematic Gallery Overlay */
+        /* Fullscreen Cinematic Gallery Overlay */
         #galleryOverlay {
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 16;
+            z-index: 18;
             pointer-events: none;
             opacity: 0;
             overflow: hidden;
-            will-change: opacity;
+            will-change: opacity, transform;
             background: transparent;
         }
 
@@ -536,6 +539,21 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            padding: 2vh 4vw;
+        }
+
+        .slide-img-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px -15px rgba(0,0,0,0.9), 0 0 40px rgba(100, 223, 223, 0.15);
+            border: 1px solid rgba(100, 223, 223, 0.22);
+            background: #040d15;
         }
 
         .slide-img {
@@ -543,11 +561,15 @@
             height: 100%;
             object-fit: cover;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
             image-rendering: -webkit-optimize-contrast;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+        }
+
+        .slide-container:hover .slide-img {
+            transform: scale(1.03);
         }
 
         /* Custom Scrollbar */
@@ -594,12 +616,16 @@
             </div>
         </section>
 
-        <!-- Legacy of Visual Storytelling Section -->
+     <!-- Legacy of Visual Storytelling Section -->
         <section class="scroll-section justify-center lg:justify-end px-4 sm:px-8 md:px-16 lg:px-24" id="textSection1">
-            <div class="cinematic-glass-card @container max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
+            <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:ml-auto lg:mr-0" id="card1">
                 <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
-                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider">LEGACY OF</span>
-                    <span class="maroon-cyan-sweep font-normal whitespace-nowrap block tracking-normal sm:tracking-wide text-[clamp(0.9rem,8.5cqw,2.2rem)]">RAJANS PHOTOGRAPHY</span>
+                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider mb-1">LEGACY OF</span>
+                    <span class="maroon-cyan-sweep block w-full">
+                        <svg class="w-full h-auto block" viewBox="0 0 380 34" preserveAspectRatio="xMinYMid meet" aria-label="RAJANS PHOTOGRAPHY">
+                            <text x="0" y="27" fill="#ffffff" font-family="Montserrat, sans-serif" font-weight="400" font-size="28" letter-spacing="2">RAJANS PHOTOGRAPHY</text>
+                        </svg>
+                    </span>
                 </h2>
                 <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText1">Founded in 2003, the Photographic Society of Dharmaraja College has been dedicated to promoting photography among young enthusiasts through national events, competitions, livestreams, workshops, and educational activities, helping students develop their creative vision and technical mastery.</p>
             </div>
@@ -610,10 +636,14 @@
 
         <!-- Sri Lanka’s Premier All-Island Photography Competition Section -->
         <section class="scroll-section justify-center lg:justify-start px-4 sm:px-8 md:px-16 lg:px-24" id="textSection2">
-            <div class="cinematic-glass-card @container max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:mr-auto lg:ml-0" id="card2">
+            <div class="cinematic-glass-card max-w-xl lg:max-w-2xl p-6 sm:p-10 lg:p-12 w-full mx-auto lg:mr-auto lg:ml-0" id="card2">
                 <h2 class="mb-4 text-white text-center lg:text-left leading-snug uppercase">
-                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider">SRI LANKA'S PREMIER</span>
-                    <span class="maroon-cyan-sweep font-normal whitespace-nowrap block tracking-normal sm:tracking-wide text-[clamp(0.75rem,5.2cqw,1.55rem)]">ALL-ISLAND PHOTOGRAPHY COMPETITION</span>
+                    <span class="font-bold text-xl sm:text-2xl lg:text-3xl block tracking-wider mb-1">SRI LANKA'S PREMIER</span>
+                    <span class="maroon-cyan-sweep block w-full">
+                        <svg class="w-full h-auto block" viewBox="0 0 540 30" preserveAspectRatio="xMinYMid meet" aria-label="ALL-ISLAND PHOTOGRAPHY COMPETITION">
+                            <text x="0" y="24" fill="#ffffff" font-family="Montserrat, sans-serif" font-weight="400" font-size="22" letter-spacing="1">ALL-ISLAND PHOTOGRAPHY COMPETITION</text>
+                        </svg>
+                    </span>
                 </h2>
                 <p class="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-200 tracking-wide font-medium text-justify" id="animatedText2">Speculo is the society’s signature all-island photography competition and exhibition, providing Sri Lankan photographers with a powerful platform. The event features hands-on masterclasses by renowned photographers and a live photography photowalk capturing the historic beauty of Sri Lanka.</p>
             </div>
@@ -677,12 +707,13 @@
     <!-- Fixed Fullscreen Gallery Overlay -->
     <div id="galleryOverlay" aria-hidden="true">
         <div id="galleryDragHint" class="pointer-events-none fixed inset-x-0 bottom-20 z-30 flex flex-col items-center justify-center transition-opacity duration-700 opacity-0" style="display: none;">
-            <div class="liquid-glass px-5 py-2.5 rounded-full flex items-center space-x-3 text-white/80 text-xs tracking-wider uppercase shadow-xl">
-                <span>Scroll to Traverse Gallery • Click to View</span>
+            <div class="liquid-glass px-5 py-2.5 rounded-full flex items-center space-x-3 text-white/90 text-xs tracking-wider uppercase shadow-2xl border border-[#64dfdf]/40">
+                <span class="inline-block w-2 h-2 rounded-full bg-[#64dfdf] animate-ping"></span>
+                <span>Scroll to Traverse Gallery • Click Photograph to Enlarge</span>
             </div>
         </div>
         <nav class="fixed bottom-6 inset-x-0 z-30 flex justify-center pointer-events-none" aria-label="Gallery Pagination">
-            <div id="galleryDotsContainer" class="liquid-glass px-3.5 py-1.5 rounded-full flex items-center space-x-2 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity duration-500"></div>
+            <div id="galleryDotsContainer" class="liquid-glass px-3.5 py-1.5 rounded-full flex items-center space-x-2 pointer-events-auto opacity-80 hover:opacity-100 transition-opacity duration-500"></div>
         </nav>
         <main id="galleryTrack"></main>
     </div>
@@ -757,9 +788,12 @@
                 slide.className = 'slide-container';
                 slide.setAttribute('data-index', idx);
 
+                const wrapper = document.createElement('div');
+                wrapper.className = 'slide-img-wrapper';
+
                 const skeleton = document.createElement('div');
                 skeleton.className = 'absolute inset-0 skeleton-loader';
-                slide.appendChild(skeleton);
+                wrapper.appendChild(skeleton);
 
                 const img = document.createElement('img');
                 img.alt = `Speculo Photography Exhibit ${idx + 1}`;
@@ -778,7 +812,8 @@
                     handleImageReveal();
                 };
                 img.src = src;
-                slide.appendChild(img);
+                wrapper.appendChild(img);
+                slide.appendChild(wrapper);
 
                 slide.addEventListener('click', () => {
                     openLightbox(img.src, `Speculo Photography Exhibit ${idx + 1}`);
@@ -1111,7 +1146,7 @@
                 vec2 split = (sLen > 0.00001 ? sDir / sLen : vec2(0.7071)) * uRefraction * 0.16 * (0.35 + lens * 1.65);
                 vec4 base = sampleText(d);
                 fragColor = vec4(vec3(sampleText(d + split).r, base.g, sampleText(d - split).b) + lens * base.a * 0.055, max(max(sampleText(d + split).a, base.a), sampleText(d - split).a));
-            }`;
+            } `;
 
             function initLogoWarpEffect() {
                 try {
@@ -1331,8 +1366,8 @@
 
                 const galleryProgress = Math.max(0, Math.min(1, (scrollPosition - galleryStart) / Math.max(1, galleryEnd - galleryStart)));
 
-                const entry = 0.06;
-                const exit = 0.94;
+                const entry = 0.04;
+                const exit = 0.96;
                 let rawOpacity = 0;
 
                 if (galleryProgress <= entry) {
@@ -1345,24 +1380,34 @@
                     rawOpacity = 1 - p;
                 }
 
-                const overlayOpacity = Math.max(0, Math.min(0.95, rawOpacity));
+                const overlayOpacity = Math.max(0, Math.min(1, rawOpacity));
                 const isActiveThreshold = galleryProgress > 0 && galleryProgress < 1 && (gRect.top < vh && gRect.bottom > 0);
 
-                if (isActiveThreshold) {
+                if (isActiveThreshold && overlayOpacity > 0.01) {
                     galleryOverlay.style.display = 'block';
-                    galleryOverlay.style.opacity = Math.max(0.01, overlayOpacity).toFixed(3);
-                    galleryOverlay.style.pointerEvents = overlayOpacity > 0.05 ? 'auto' : 'none';
+                    galleryOverlay.style.opacity = overlayOpacity.toFixed(3);
+                    galleryOverlay.style.pointerEvents = overlayOpacity > 0.1 ? 'auto' : 'none';
+
                     if (galleryBackdropVeil) {
                         galleryBackdropVeil.style.display = 'block';
-                        galleryBackdropVeil.style.opacity = overlayOpacity.toFixed(3);
+                        galleryBackdropVeil.style.opacity = (overlayOpacity * 0.94).toFixed(3);
+                    }
+                    if (galleryDragHint) {
+                        galleryDragHint.style.display = 'flex';
+                        galleryDragHint.style.opacity = overlayOpacity > 0.35 ? '1' : '0';
                     }
                 } else {
                     galleryOverlay.style.display = 'none';
                     galleryOverlay.style.opacity = '0';
                     galleryOverlay.style.pointerEvents = 'none';
+
                     if (galleryBackdropVeil) {
                         galleryBackdropVeil.style.display = 'none';
                         galleryBackdropVeil.style.opacity = '0';
+                    }
+                    if (galleryDragHint) {
+                        galleryDragHint.style.display = 'none';
+                        galleryDragHint.style.opacity = '0';
                     }
                 }
 
@@ -1550,6 +1595,16 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        const THEMES_DATA = [
+          { id: "colour", title: "COLOUR", number: "01", desc: "Vibrant and colorful photography that captures the beauty of our world in full spectrum.", ambientColor: "#030814", glowColor: "rgba(100, 223, 223, 0.45)", accent: "#64dfdf" },
+          { id: "mono", title: "MONO", number: "02", desc: "Black and white photography that tells powerful stories through contrast, shadow, and texture.", ambientColor: "#050505", glowColor: "rgba(220, 220, 230, 0.4)", accent: "#e2e8f0" },
+          { id: "mobile", title: "MOBILE", number: "03", desc: "Stunning images captured with mobile devices, proving great photography is in the visionary eye.", ambientColor: "#100602", glowColor: "rgba(255, 120, 40, 0.45)", accent: "#fb923c" },
+          { id: "wild", title: "WILD", number: "04", desc: "Photography that showcases animals in their natural habitat and the untamed beauty of wildlife.", ambientColor: "#020d06", glowColor: "rgba(40, 190, 100, 0.45)", accent: "#34d399" },
+          { id: "macro", title: "MACRO", number: "05", desc: "Extreme close-up photography capturing miniature details invisible to the naked human eye.", ambientColor: "#060910", glowColor: "rgba(160, 190, 240, 0.45)", accent: "#93c5fd" },
+          { id: "street", title: "STREET", number: "06", desc: "Authentic and candid moments from everyday life through the spontaneous lens of the street.", ambientColor: "#0e0303", glowColor: "rgba(240, 80, 80, 0.45)", accent: "#f87171" },
+          { id: "architecture", title: "ARCHITECTURE", number: "07", desc: "Creative images capturing the geometric craft of buildings, cityscapes, and man-made structures.", ambientColor: "#0f0e0c", glowColor: "rgba(240, 210, 170, 0.45)", accent: "#fde68a" }
+        ];
 
         const EXECUTIVES_DESKTOP = [
           { title: "ASST TREASURER", name: "DHARANA PILAPITIYA" },
