@@ -29,6 +29,11 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing type field' });
     }
 
+    // ── Online submissions are closed ──
+    if (type === 'online') {
+      return res.status(403).json({ error: 'Online submissions are now closed.' });
+    }
+
     // Set up Google Drive folders
       const folderName = type === 'physical' ? school : name;
       const driveFolderId = await setupStudentFolder(type, school, folderName);
